@@ -37,4 +37,18 @@
     #};
   };
 
+  programs.ssh = {
+    enable = true;
+
+    matchBlocks."github.com" = {
+      hostname = "github.com";
+      user = "git";
+      identitiesOnly = true;
+
+      extraOptions = { AddressFamily = "inet"; };
+      identityFile = [ "~/.ssh/id_ssh_empathy117" ];
+    };
+  };
+  services.ssh-agent.enable = true;
+
 }
