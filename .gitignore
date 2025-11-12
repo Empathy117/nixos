@@ -1,0 +1,11 @@
+/result
+/result-*/
+
+.direv/
+.envrc
+
+*.key
+*.pem
+*.crt
+*.age
+secrets/*.yaml
