@@ -22,6 +22,7 @@
         nixos-wsl.nixosModules.default
         ./hosts/wsl.nix            # ← 在这里“局部启用” HM 集成
         ./common/common.nix
+        ./common/keygen.nix
         home-manager.nixosModules.home-manager
       ];
     };
