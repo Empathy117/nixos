@@ -3,7 +3,7 @@
 { config, lib, ... }:
 
 {
-  home.activation.ensureSshKey = lib.hm.dag.entryAfter [ "writeBoundary"] ''
+  home.activation.ensureSshKey = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
     set -eu
     umask 077
     if [ ! -f "$HOME/.ssh/id_ssh_empathy117" ]; then

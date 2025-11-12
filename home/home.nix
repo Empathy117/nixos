@@ -14,6 +14,10 @@
     pkgs.openssl
   ];
 
+  imports = [
+    ../common/keygen.nix
+  ];
+
   programs.git = {
     enable = true;
 
