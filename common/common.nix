@@ -1,4 +1,4 @@
-# ~/my-nixos-config/common.nix
+# ~/nixos/common/common.nix
 
 { config, lib, pkgs, ... }:
 

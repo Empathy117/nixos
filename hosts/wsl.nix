@@ -1,4 +1,4 @@
-# ~/my-nixos-config/wsl.nix
+# ~/nixos/hosts/wsl.nix
 
 { config, lib, pkgs, ...}:
 

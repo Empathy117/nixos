@@ -1,4 +1,4 @@
-# ~/my-nixos-config/home.nix
+# ~/nixos/home/home.nix
 
 { config, pkgs, ... }:
 
@@ -11,6 +11,7 @@
     pkgs.wget
     pkgs.python314
     pkgs.fastfetch
+    pkgs.openssl
   ];
 
   programs.git = {
