@@ -22,7 +22,7 @@
 
       net.defaultAddressFamily = "inet";
     
-      #url."https://gh-proxy.com/https://github.com/".insteadOf = "https://github.com/";
+      url."https://gh-proxy.com/https://github.com/".insteadOf = "https://github.com/";
 
       core.sshCommand = "ssh -4";
     };
