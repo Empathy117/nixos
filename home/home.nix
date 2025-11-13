@@ -14,6 +14,7 @@
     openssl
     nixd
     direnv
+    alejandra
     pkgsUnstable.codex
   ];
 
