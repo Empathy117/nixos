@@ -10,12 +10,16 @@
       url = "github:nix-community/home-manager/release-25.05";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    nixos-vscode-server = {
+      url = "github:nix-community/nixos-vscode-server";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
     nixos-wsl = {
       url = "github:nix-community/NixOS-WSL";
     };
   };
 
-  outputs = { self, nixpkgs, home-manager, nixos-wsl, nixpkgs-unstable, ... }: 
+  outputs = { self, nixpkgs, home-manager, nixos-wsl, nixos-vscode-server, nixpkgs-unstable, ... }: 
   let 
     system = "x86_64-linux";
     pkgsStable = import nixpkgs { inherit system; };
@@ -33,6 +37,7 @@
       modules = [
         nixos-wsl.nixosModules.default
         ./hosts/wsl.nix 
+        nixos-vscode-server.nixosModules.default
         ./common/common.nix
 
         home-manager.nixosModules.home-manager {

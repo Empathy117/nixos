@@ -22,6 +22,10 @@
   # --- 基础环境 ---
   time.timeZone = "Asia/Shanghai"; # 所有机器都用这个时区
 
+  # --- VS Code Remote Development 支持 ---
+  # 内置的 vscode-server 模块负责在目标机器上常驻 VSCode 远程端
+  services.vscode-server.enable = true;
+
   # --- NixOS 版本锚点 ---
   system.stateVersion = "25.05";
 }
