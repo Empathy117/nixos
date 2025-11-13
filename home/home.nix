@@ -12,6 +12,7 @@
     pkgs.python314
     pkgs.fastfetch
     pkgs.openssl
+    pkgs.codex
   ];
 
   imports = [
