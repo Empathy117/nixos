@@ -1,7 +1,7 @@
 { config, lib, pkgs, ... }:
 
 let
-  inherit (lib) generators mkMerge;
+  inherit (lib) mkMerge;
 
   vscodeSettings = import ./settings.nix;
   extensionData = import ./extensions.nix { inherit pkgs lib; };
@@ -9,10 +9,7 @@ let
 
   json =
     value:
-    generators.toPrettyJSON {
-      indent = "  ";
-    } value
-    + "\n";
+    builtins.toJSON value + "\n";
 
   homeDir = config.home.homeDirectory;
 

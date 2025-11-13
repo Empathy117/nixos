@@ -11,9 +11,8 @@ let
     // {
       drv = pkgs.vscode-utils.buildVscodeMarketplaceExtension {
         mktplcRef = {
-          inherit (spec) publisher name version;
+          inherit (spec) publisher name version sha256;
         };
-        sha256 = spec.sha256;
       };
     };
 in {

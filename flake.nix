@@ -32,6 +32,25 @@
       inherit system;
       config.allowUnfree = true;
     };
+    lib = nixpkgs.lib;
+    repoSrc = lib.cleanSource ./.;
+    mkCheck =
+      name: toolInputs: command:
+        pkgsStable.runCommand name {buildInputs = toolInputs;} ''
+          ${command}
+          touch $out
+        '';
+    updateVscodeExtensionsApp = pkgsStable.writeShellApplication {
+      name = "update-vscode-extensions";
+      runtimeInputs = [
+        pkgsStable.nix
+        pkgsStable.python3
+      ];
+      text = ''
+        set -euo pipefail
+        python3 ${./scripts/update-vscode-extensions.py} "$PWD"
+      '';
+    };
   in {
     # WSL: NixOS 集成 Home Manager
     nixosConfigurations.wsl = nixpkgs.lib.nixosSystem {
@@ -71,6 +90,16 @@
         ./home/home.nix
         ./common/common.nix
       ];
+    };
+
+    apps.${system}.update-vscode-extensions = {
+      type = "app";
+      program = "${updateVscodeExtensionsApp}/bin/update-vscode-extensions";
+    };
+
+    checks.${system} = {
+      statix = mkCheck "statix-check" [pkgsStable.statix] "statix check ${repoSrc}";
+      deadnix = mkCheck "deadnix-check" [pkgsStable.deadnix] "deadnix --fail ${repoSrc}";
     };
   };
 }

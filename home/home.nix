@@ -14,12 +14,15 @@
     openssl
     nixd
     direnv
+    statix
+    deadnix
     alejandra
     pkgsUnstable.codex
   ];
 
   imports = [
     ../common/keygen.nix
+    ./vscode
   ];
 
   programs.git = {
@@ -72,30 +75,4 @@
   };
   services.ssh-agent.enable = true;
 
-  # VS Code Remote (WSL) settings live under ~/.vscode-server.
-  home.file.".vscode-server/data/Machine/settings.json" = {
-    force = true;
-    text =
-      builtins.toJSON {
-        "[nix]" = {
-          editor.defaultFormatter = "jnoortheen.nix-ide";
-        };
-        "editor.formatOnSave" = true;
-        "git.autofetch" = true;
-        "nix.enableLanguageServer" = true;
-        "nix.serverPath" = "nixd";
-        "nix.formatterPath" = "alejandra";
-        "nix.serverSettings" = {
-          nixd.formatting.command = ["alejandra" "--quiet"];
-        };
-      }
-      + "\n";
-  };
-
-  # Tell nixd itself to shell out to alejandra, matching VS Code.
-  xdg.configFile."nixd/config.json".text =
-    builtins.toJSON {
-      formatter.command = ["alejandra" "--quiet"];
-    }
-    + "\n";
 }
