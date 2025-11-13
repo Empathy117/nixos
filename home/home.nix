@@ -12,6 +12,7 @@
     python314
     fastfetch
     openssl
+    nixd
     pkgsUnstable.codex
   ];
 
