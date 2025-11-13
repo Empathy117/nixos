@@ -27,7 +27,10 @@
     ...
   }: let
     system = "x86_64-linux";
-    pkgsStable = import nixpkgs {inherit system;};
+    pkgsStable = import nixpkgs {
+      inherit system;
+      config.allowUnfree = true;
+    };
     pkgsUnstable = import nixpkgs-unstable {
       inherit system;
       config.allowUnfree = true;
@@ -40,17 +43,6 @@
           ${command}
           touch $out
         '';
-    updateVscodeExtensionsApp = pkgsStable.writeShellApplication {
-      name = "update-vscode-extensions";
-      runtimeInputs = [
-        pkgsStable.nix
-        pkgsStable.python3
-      ];
-      text = ''
-        set -euo pipefail
-        python3 ${./scripts/update-vscode-extensions.py} "$PWD"
-      '';
-    };
   in {
     # WSL: NixOS 集成 Home Manager
     nixosConfigurations.wsl = nixpkgs.lib.nixosSystem {
@@ -90,11 +82,6 @@
         ./home/home.nix
         ./common/common.nix
       ];
-    };
-
-    apps.${system}.update-vscode-extensions = {
-      type = "app";
-      program = "${updateVscodeExtensionsApp}/bin/update-vscode-extensions";
     };
 
     checks.${system} = {

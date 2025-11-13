@@ -4,24 +4,31 @@ let
   inherit (lib) mkMerge;
 
   vscodeSettings = import ./settings.nix;
-  extensionData = import ./extensions.nix { inherit pkgs lib; };
-  remoteExtensions = extensionData.extensions;
+  extensionConfig = import ./extensions.nix { inherit pkgs; };
+  remoteExtensions = extensionConfig.remote;
 
   json =
-    value:
-    builtins.toJSON value + "\n";
+    value: builtins.toJSON value + "\n";
 
   homeDir = config.home.homeDirectory;
+
+  vscodeWithExtensions =
+    (pkgs.vscode-with-extensions.override {
+      vscodeExtensions = extensionConfig.packages;
+    }).overrideAttrs (_: {
+      pname = "vscode";
+      version = pkgs.vscode.version;
+    });
 
   extensionLinks =
     builtins.listToAttrs (
       map
         (ext: {
-          name = ".vscode-server/extensions/${ext.publisher}.${ext.name}-${ext.version}";
+          name = ".vscode-server/extensions/${ext.uniqueId}-${ext.version}";
           value = {
             force = true;
             recursive = true;
-            source = "${ext.drv}/share/vscode/extensions/${ext.publisher}.${ext.name}";
+            source = "${ext.drv}/share/vscode/extensions/${ext.uniqueId}";
           };
         })
         remoteExtensions
@@ -32,14 +39,14 @@ let
       map
         (ext: {
           identifier = {
-            id = "${ext.publisher}.${ext.name}";
+            id = ext.uniqueId;
             uuid = "";
           };
           version = ext.version;
-          relativeLocation = "${ext.publisher}.${ext.name}-${ext.version}";
+          relativeLocation = "${ext.uniqueId}-${ext.version}";
           location = {
             "$mid" = 1;
-            path = "${homeDir}/.vscode-server/extensions/${ext.publisher}.${ext.name}-${ext.version}";
+            path = "${homeDir}/.vscode-server/extensions/${ext.uniqueId}-${ext.version}";
             scheme = "file";
           };
           metadata = {
@@ -56,6 +63,12 @@ let
     );
 in
 {
+  programs.vscode = {
+    enable = true;
+    package = vscodeWithExtensions;
+    userSettings = vscodeSettings;
+  };
+
   home.file = mkMerge [
     extensionLinks
     {

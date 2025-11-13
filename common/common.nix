@@ -16,6 +16,8 @@
     };
   };
 
+  nixpkgs.config.allowUnfree = true;
+
   # --- 基础环境 ---
   time.timeZone = "Asia/Shanghai"; # 所有机器都用这个时区
 
