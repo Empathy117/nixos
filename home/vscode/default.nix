@@ -1,15 +1,11 @@
-{ config, lib, pkgs, ... }:
+{ config, lib, ... }:
 
 let
   inherit (lib) mkMerge;
+  settings = config.shared.vscode.userSettings;
+  remoteExtensions = config.shared.vscode.remoteMetadata;
 
-  vscodeSettings = import ./settings.nix;
-  extensionConfig = import ./extensions.nix { inherit pkgs; };
-  remoteExtensions = extensionConfig.remote;
-
-  json =
-    value: builtins.toJSON value + "\n";
-
+  json = value: builtins.toJSON value + "\n";
   homeDir = config.home.homeDirectory;
 
   extensionLinks =
@@ -54,8 +50,7 @@ let
         remoteExtensions
     );
 in {
-  # We only manage the remote VS Code Server state; the GUI runs on Windows,
-  # so we intentionally do not enable programs.vscode inside WSL.
+  # WSL: only manage remote server state; GUI VS Code stays on Windows.
   home.file = mkMerge [
     extensionLinks
     {
@@ -65,7 +60,7 @@ in {
       };
       ".vscode-server/data/Machine/settings.json" = {
         force = true;
-        text = json vscodeSettings;
+        text = json settings;
       };
     }
   ];

@@ -22,6 +22,7 @@
 
   imports = [
     ../common/keygen.nix
+    ../modules/vscode/base.nix
     ./vscode
   ];
 
