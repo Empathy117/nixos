@@ -9,3 +9,5 @@
 *.crt
 *.age
 secrets/*.yaml
+
+*.vsix
