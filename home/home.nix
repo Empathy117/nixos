@@ -1,18 +1,18 @@
-# ~/nixos/home/home.nix
+# home/home.nix
 
-{ config, pkgs, ... }:
+{ config, pkgs, pkgsUnstable, ... }:
 
 {
 
   home.stateVersion = "25.05";
-
-  home.packages = [ 
-    pkgs.vim
-    pkgs.wget
-    pkgs.python314
-    pkgs.fastfetch
-    pkgs.openssl
-    pkgs.codex
+  
+  home.packages = with pkgs; [ 
+    vim
+    wget
+    python314
+    fastfetch
+    openssl
+    pkgsUnstable.codex
   ];
 
   imports = [

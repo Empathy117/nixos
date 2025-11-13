@@ -1,10 +1,11 @@
-# ~/my-nixos-config/flake.nix
+# flake.nix
 
 {
   description = "My NixOS configuration";
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-25.05";
+    nixpkgs-unstable.url = "github:NixOS/nixpkgs/nixos-unstable";
     home-manager = {
       url = "github:nix-community/home-manager/release-25.05";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -14,29 +15,51 @@
     };
   };
 
-  outputs = { self, nixpkgs, home-manager, nixos-wsl, ... }: {
-    # ① WSL: NixOS 集成 Home Manager
+  outputs = { self, nixpkgs, home-manager, nixos-wsl, nixpkgs-unstable, ... }: 
+  let 
+    system = "x86_64-linux";
+    pkgsStable = import nixpkgs { inherit system; };
+    pkgsUnstable = import nixpkgs-unstable {
+      inherit system;
+      config.allowUnfree = true;
+    };
+  in {
+    # WSL: NixOS 集成 Home Manager
     nixosConfigurations.wsl = nixpkgs.lib.nixosSystem {
-      system = "x86_64-linux";
+      inherit system;
+
+      specialArgs = { inherit pkgsUnstable; };
+
       modules = [
         nixos-wsl.nixosModules.default
-        ./hosts/wsl.nix            # ← 在这里“局部启用” HM 集成
+        ./hosts/wsl.nix 
         ./common/common.nix
-        home-manager.nixosModules.home-manager
+
+        home-manager.nixosModules.home-manager {
+          home-manager.useGlobalPkgs = true;
+          home-manager.useUserPackages = true;
+          home-manager.extraSpecialArgs = { inherit pkgsUnstable; };
+
+          home-manager.users.nixos = {
+            imports = [
+              ./home/home.nix
+            ];
+          };
+        }
       ];
     };
 
-    # ② 物理机（或其他非 NixOS 场景）: 独立 Home Manager
-    homeConfigurations."empathy@leny" =
-      home-manager.lib.homeManagerConfiguration {
-        # 目标平台：按实际改（x86_64-linux / aarch64-linux / aarch64-darwin）
-        pkgs = import nixpkgs { system = "x86_64-linux"; };
+    # 纯 Home Manager 配置
+    homeConfigurations."empathy@leny" = home-manager.lib.homeManagerConfiguration {
+      pkgs = pkgsStable;
+        
+      extraSecialArgs = { inherit pkgsUnstable; };
 
-        # 直接复用同一个 home.nix
-        modules = [ ./home/home.nix ];
-
-        # 可选：指定 username/home 路径（默认从环境推断）
-        # extraSpecialArgs = { };
-      };
+      # 直接复用同一个 home.nix
+      modules = [ 
+        ./home/home.nix
+        ./common/common.nix 
+      ];
+    };
   };
 }
