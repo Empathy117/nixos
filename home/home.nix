@@ -13,6 +13,7 @@
     fastfetch
     openssl
     nixd
+    direnv
     pkgsUnstable.codex
   ];
 
