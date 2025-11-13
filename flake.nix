@@ -1,5 +1,4 @@
 # flake.nix
-
 {
   description = "My NixOS configuration";
 
@@ -19,10 +18,16 @@
     };
   };
 
-  outputs = { nixpkgs, home-manager, nixos-wsl, nixos-vscode-server, nixpkgs-unstable, ... }: 
-  let 
+  outputs = {
+    nixpkgs,
+    home-manager,
+    nixos-wsl,
+    nixos-vscode-server,
+    nixpkgs-unstable,
+    ...
+  }: let
     system = "x86_64-linux";
-    pkgsStable = import nixpkgs { inherit system; };
+    pkgsStable = import nixpkgs {inherit system;};
     pkgsUnstable = import nixpkgs-unstable {
       inherit system;
       config.allowUnfree = true;
@@ -32,18 +37,19 @@
     nixosConfigurations.wsl = nixpkgs.lib.nixosSystem {
       inherit system;
 
-      specialArgs = { inherit pkgsUnstable; };
+      specialArgs = {inherit pkgsUnstable;};
 
       modules = [
         nixos-wsl.nixosModules.default
-        ./hosts/wsl.nix 
+        ./hosts/wsl.nix
         nixos-vscode-server.nixosModules.default
         ./common/common.nix
 
-        home-manager.nixosModules.home-manager {
+        home-manager.nixosModules.home-manager
+        {
           home-manager.useGlobalPkgs = true;
           home-manager.useUserPackages = true;
-          home-manager.extraSpecialArgs = { inherit pkgsUnstable; };
+          home-manager.extraSpecialArgs = {inherit pkgsUnstable;};
 
           home-manager.users.nixos = {
             imports = [
@@ -57,13 +63,13 @@
     # 纯 Home Manager 配置
     homeConfigurations."empathy@leny" = home-manager.lib.homeManagerConfiguration {
       pkgs = pkgsStable;
-        
-      extraSecialArgs = { inherit pkgsUnstable; };
+
+      extraSecialArgs = {inherit pkgsUnstable;};
 
       # 直接复用同一个 home.nix
-      modules = [ 
+      modules = [
         ./home/home.nix
-        ./common/common.nix 
+        ./common/common.nix
       ];
     };
   };

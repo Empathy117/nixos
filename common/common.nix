@@ -1,8 +1,5 @@
-# ~/nixos/common/common.nix
-
-{ ... }:
-
-{
+# common/common.nix
+{...}: {
   # --- 联网与镜像 (所有机器都需要) ---
   nix = {
     settings = {
