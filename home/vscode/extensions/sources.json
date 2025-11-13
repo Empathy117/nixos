@@ -1,0 +1,6 @@
+[
+  { "publisher": "jnoortheen", "name": "nix-ide" },
+  { "publisher": "mkhl", "name": "direnv" },
+  { "publisher": "pinage404", "name": "nix-extension-pack" },
+  { "publisher": "arrterian", "name": "nix-env-selector" }
+]
