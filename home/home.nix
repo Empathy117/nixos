@@ -46,12 +46,13 @@
     enable = true;
 
     matchBlocks."github.com" = {
-      hostname = "github.com";
+      hostname = "ssh.github.com";
+      prot = 443;
       user = "git";
       identitiesOnly = true;
 
       extraOptions = { AddressFamily = "inet"; };
-      identityFile = [ "~/.ssh/id_ssh_empathy117" ];
+      identityFile = [ "~/.ssh/id_ed25519" ];
     };
   };
   services.ssh-agent.enable = true;
