@@ -12,14 +12,6 @@ let
 
   homeDir = config.home.homeDirectory;
 
-  vscodeWithExtensions =
-    (pkgs.vscode-with-extensions.override {
-      vscodeExtensions = extensionConfig.packages;
-    }).overrideAttrs (_: {
-      pname = "vscode";
-      version = pkgs.vscode.version;
-    });
-
   extensionLinks =
     builtins.listToAttrs (
       map
@@ -61,14 +53,9 @@ let
         })
         remoteExtensions
     );
-in
-{
-  programs.vscode = {
-    enable = true;
-    package = vscodeWithExtensions;
-    userSettings = vscodeSettings;
-  };
-
+in {
+  # We only manage the remote VS Code Server state; the GUI runs on Windows,
+  # so we intentionally do not enable programs.vscode inside WSL.
   home.file = mkMerge [
     extensionLinks
     {
