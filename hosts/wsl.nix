@@ -1,6 +1,6 @@
 # ~/nixos/hosts/wsl.nix
 
-{ config, lib, pkgs, ...}:
+{ ... }:
 
 {
   wsl.enable = true;

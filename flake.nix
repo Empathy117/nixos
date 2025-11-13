@@ -19,7 +19,7 @@
     };
   };
 
-  outputs = { self, nixpkgs, home-manager, nixos-wsl, nixos-vscode-server, nixpkgs-unstable, ... }: 
+  outputs = { nixpkgs, home-manager, nixos-wsl, nixos-vscode-server, nixpkgs-unstable, ... }: 
   let 
     system = "x86_64-linux";
     pkgsStable = import nixpkgs { inherit system; };

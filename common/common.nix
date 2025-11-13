@@ -1,6 +1,6 @@
 # ~/nixos/common/common.nix
 
-{ config, lib, pkgs, ... }:
+{ ... }:
 
 {
   # --- 联网与镜像 (所有机器都需要) ---

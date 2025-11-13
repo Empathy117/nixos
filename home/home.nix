@@ -1,6 +1,6 @@
 # home/home.nix
 
-{ config, pkgs, pkgsUnstable, ... }:
+{ pkgs, pkgsUnstable, ... }:
 
 {
 
