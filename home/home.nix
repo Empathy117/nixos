@@ -47,7 +47,7 @@
 
     matchBlocks."github.com" = {
       hostname = "ssh.github.com";
-      prot = 443;
+      port = 443;
       user = "git";
       identitiesOnly = true;
 
