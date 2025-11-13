@@ -29,6 +29,7 @@
     
       #url."https://gh-proxy.com/https://github.com/".insteadOf = "https://github.com/";
       url."ssh://git@github.com/".insteadOf = "https://github.com/";
+      url."ssh://git@gitee.com/".insteadOf = "https://gitee.com/";
 
       core.sshCommand = "ssh -4";
     };
@@ -48,6 +49,15 @@
 
     matchBlocks."github.com" = {
       hostname = "ssh.github.com";
+      port = 443;
+      user = "git";
+      identitiesOnly = true;
+
+      extraOptions = { AddressFamily = "inet"; };
+      identityFile = [ "~/.ssh/id_ed25519" ];
+    };
+    matchBlocks."gitee.com" = {
+      hostname = "ssh.gitee.com";
       port = 443;
       user = "git";
       identitiesOnly = true;
