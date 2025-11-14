@@ -18,78 +18,128 @@
     };
   };
 
-  outputs =
-    {
-      nixpkgs,
-      home-manager,
-      nixos-wsl,
-      nixos-vscode-server,
-      nixpkgs-unstable,
-      ...
-    }:
+  outputs = {
+    nixpkgs,
+    nixpkgs-unstable,
+    home-manager,
+    nixos-wsl,
+    nixos-vscode-server,
+    ...
+  }:
     let
-      system = "x86_64-linux";
-      pkgsStable = import nixpkgs {
+      inherit (nixpkgs) lib;
+      defaultSystem = "x86_64-linux";
+
+      mkPkgs = system: import nixpkgs {
         inherit system;
         config.allowUnfree = true;
       };
-      pkgsUnstable = import nixpkgs-unstable {
+      mkPkgsUnstable = system: import nixpkgs-unstable {
         inherit system;
         config.allowUnfree = true;
       };
-      lib = nixpkgs.lib;
+
+      pkgsDefault = mkPkgs defaultSystem;
+      pkgsUnstableDefault = mkPkgsUnstable defaultSystem;
+
       repoSrc = lib.cleanSource ./.;
-      mkCheck =
-        name: toolInputs: command:
-        pkgsStable.runCommand name { buildInputs = toolInputs; } ''
+      mkCheck = name: toolInputs: command:
+        pkgsDefault.runCommand name { buildInputs = toolInputs; } ''
           ${command}
           touch $out
         '';
+
+      hostDefs = {
+        wsl = {
+          enable = true;
+          system = "x86_64-linux";
+          systemModules = [
+            nixos-wsl.nixosModules.default
+            ./hosts/wsl.nix
+            nixos-vscode-server.nixosModules.default
+            ./modules/system/vscode-remote.nix
+          ];
+          homeModules = {
+            nixos = [
+              ./home/home.nix
+              ./home/vscode
+            ];
+          };
+        };
+
+        devbox = {
+          enable = false;
+          system = "x86_64-linux";
+          systemModules = [
+            ./hosts/devbox.nix
+            nixos-vscode-server.nixosModules.default
+            ./modules/system/vscode-remote.nix
+          ];
+          homeModules = {
+            empathy = [
+              ./home/home.nix
+              ./home/vscode
+            ];
+          };
+        };
+        };
+
+      mkNixosHost = name: cfg:
+        let
+          system = cfg.system or defaultSystem;
+          pkgsUnstable = mkPkgsUnstable system;
+          homeModules = cfg.homeModules or {};
+        in
+        lib.nixosSystem {
+          inherit system;
+          specialArgs =
+            {
+              inherit pkgsUnstable;
+            }
+            // (cfg.specialArgs or {});
+          modules =
+            [
+              ./modules/system/core.nix
+              (_: {
+                networking.hostName = lib.mkDefault name;
+              })
+            ]
+            ++ (cfg.systemModules or [])
+            ++ lib.optionals (homeModules != {}) [
+              home-manager.nixosModules.home-manager
+              {
+                home-manager = {
+                  useGlobalPkgs = true;
+                  useUserPackages = true;
+                  extraSpecialArgs = { inherit pkgsUnstable; };
+                  users =
+                    lib.mapAttrs (_: modules: { imports = modules; }) homeModules;
+                };
+              }
+            ];
+        };
+      activeHosts = lib.filterAttrs (_: cfg: cfg.enable or true) hostDefs;
     in
     {
-      # WSL: NixOS 集成 Home Manager
-      nixosConfigurations.wsl = nixpkgs.lib.nixosSystem {
-        inherit system;
+      nixosConfigurations = lib.mapAttrs mkNixosHost activeHosts;
 
-        specialArgs = { inherit pkgsUnstable; };
-
-        modules = [
-          nixos-wsl.nixosModules.default
-          ./hosts/wsl.nix
-          nixos-vscode-server.nixosModules.default
-          ./common/common.nix
-
-          home-manager.nixosModules.home-manager
-          {
-            home-manager.useGlobalPkgs = true;
-            home-manager.useUserPackages = true;
-            home-manager.extraSpecialArgs = { inherit pkgsUnstable; };
-
-            home-manager.users.nixos = {
-              imports = [
-                ./home/home.nix
-              ];
-            };
-          }
-        ];
-      };
-
-      # 纯 Home Manager 配置
       homeConfigurations."empathy@leny" = home-manager.lib.homeManagerConfiguration {
-        pkgs = pkgsStable;
-
-        extraSecialArgs = { inherit pkgsUnstable; };
-
-        # 直接复用同一个 home.nix
+        pkgs = pkgsDefault;
+        extraSpecialArgs = {
+          pkgsUnstable = pkgsUnstableDefault;
+        };
         modules = [
+          (_: {
+            nixpkgs.config.allowUnfree = true;
+          })
           ./home/home.nix
-          ./common/common.nix
+          ./modules/vscode/gui.nix
         ];
       };
 
-      checks.${system} = {
-        statix = mkCheck "statix-check" [ pkgsStable.statix ] "statix check ${repoSrc}";
-        deadnix = mkCheck "deadnix-check" [ pkgsStable.deadnix ] "deadnix --fail ${repoSrc}";
+      checks.${defaultSystem} = {
+        statix = mkCheck "statix-check" [ pkgsDefault.statix ] "statix check ${repoSrc}";
+        deadnix = mkCheck "deadnix-check" [ pkgsDefault.deadnix ] "deadnix --fail ${repoSrc}";
       };
     };
 }

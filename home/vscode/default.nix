@@ -25,7 +25,7 @@ let
         id = ext.uniqueId;
         uuid = "";
       };
-      version = ext.version;
+      inherit (ext) version;
       relativeLocation = "${ext.uniqueId}-${ext.version}";
       location = {
         "$mid" = 1;
@@ -45,6 +45,10 @@ let
   );
 in
 {
+  imports = [
+    ../../modules/vscode/base.nix
+  ];
+
   # WSL: only manage remote server state; GUI VS Code stays on Windows.
   home.file = mkMerge [
     extensionLinks

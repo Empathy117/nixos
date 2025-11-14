@@ -39,7 +39,7 @@ let
     drv = ext;
     publisher = ext.vscodeExtPublisher;
     name = ext.vscodeExtName;
-    version = ext.version;
+    inherit (ext) version;
     uniqueId =
       if ext ? vscodeExtUniqueId && ext.vscodeExtUniqueId != null then
         ext.vscodeExtUniqueId
