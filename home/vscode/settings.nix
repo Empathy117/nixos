@@ -5,7 +5,7 @@ in
   "editor.formatOnSave" = false;
   "git.autofetch" = true;
   "nix.enableLanguageServer" = true;
-  "nix.serverPath" = "~/.nix-profile/bin/nixd";
+  "nix.serverPath" = "nixd";
   # LSP config can be passed via ``nix.serverSettings.{lsp}`` as shown below.
   "nix.serverSettings" = {
     # check https://github.com/nix-community/nixd/blob/main/nixd/docs/configuration.md for all nixd config
