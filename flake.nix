@@ -7,7 +7,7 @@
     nixpkgs-unstable.url = "github:NixOS/nixpkgs/nixos-unstable";
     nixvim = {
       url = "github:nix-community/nixvim";
-      inputs.nixpkgs.follows = "nixpkgs";
+      inputs.nixpkgs.follows = "nixpkgs-unstable";
     };
     home-manager = {
       url = "github:nix-community/home-manager/release-25.05";
@@ -22,33 +22,39 @@
     };
   };
 
-  outputs = {
-    nixpkgs,
-    nixpkgs-unstable,
-    home-manager,
-    nixvim,
-    nixos-wsl,
-    nixos-vscode-server,
-    ...
-  }:
+  outputs =
+    {
+      nixpkgs,
+      nixpkgs-unstable,
+      home-manager,
+      nixvim,
+      nixos-wsl,
+      nixos-vscode-server,
+      ...
+    }:
     let
       inherit (nixpkgs) lib;
       defaultSystem = "x86_64-linux";
 
-      mkPkgs = system: import nixpkgs {
-        inherit system;
-        config.allowUnfree = true;
-      };
-      mkPkgsUnstable = system: import nixpkgs-unstable {
-        inherit system;
-        config.allowUnfree = true;
-      };
+      mkPkgs =
+        system:
+        import nixpkgs {
+          inherit system;
+          config.allowUnfree = true;
+        };
+      mkPkgsUnstable =
+        system:
+        import nixpkgs-unstable {
+          inherit system;
+          config.allowUnfree = true;
+        };
 
       pkgsDefault = mkPkgs defaultSystem;
       pkgsUnstableDefault = mkPkgsUnstable defaultSystem;
 
       repoSrc = lib.cleanSource ./.;
-      mkCheck = name: toolInputs: command:
+      mkCheck =
+        name: toolInputs: command:
         pkgsDefault.runCommand name { buildInputs = toolInputs; } ''
           ${command}
           touch $out
@@ -94,8 +100,8 @@
           enable = true;
           system = "x86_64-linux";
           systemModules = [
-            ./hosts/devbox.nix      
-            ./hosts/lenovo.nix      # 叠加该主机特有配置
+            ./hosts/devbox.nix
+            ./hosts/lenovo.nix # 叠加该主机特有配置
             nixos-vscode-server.nixosModules.default
             ./modules/system/vscode-remote.nix
           ];
@@ -110,39 +116,37 @@
 
       };
 
-      mkNixosHost = name: cfg:
+      mkNixosHost =
+        name: cfg:
         let
           system = cfg.system or defaultSystem;
           pkgsUnstable = mkPkgsUnstable system;
-          homeModules = cfg.homeModules or {};
+          homeModules = cfg.homeModules or { };
         in
         lib.nixosSystem {
           inherit system;
-          specialArgs =
+          specialArgs = {
+            inherit pkgsUnstable;
+          }
+          // (cfg.specialArgs or { });
+          modules = [
+            ./modules/system/core.nix
+            (_: {
+              networking.hostName = lib.mkDefault name;
+            })
+          ]
+          ++ (cfg.systemModules or [ ])
+          ++ lib.optionals (homeModules != { }) [
+            home-manager.nixosModules.home-manager
             {
-              inherit pkgsUnstable;
+              home-manager = {
+                useGlobalPkgs = true;
+                useUserPackages = true;
+                extraSpecialArgs = { inherit pkgsUnstable; };
+                users = lib.mapAttrs (_: modules: { imports = modules; }) homeModules;
+              };
             }
-            // (cfg.specialArgs or {});
-          modules =
-            [
-              ./modules/system/core.nix
-              (_: {
-                networking.hostName = lib.mkDefault name;
-              })
-            ]
-            ++ (cfg.systemModules or [])
-            ++ lib.optionals (homeModules != {}) [
-              home-manager.nixosModules.home-manager
-              {
-                home-manager = {
-                  useGlobalPkgs = true;
-                  useUserPackages = true;
-                  extraSpecialArgs = { inherit pkgsUnstable; };
-                  users =
-                    lib.mapAttrs (_: modules: { imports = modules; }) homeModules;
-                };
-              }
-            ];
+          ];
         };
       activeHosts = lib.filterAttrs (_: cfg: cfg.enable or true) hostDefs;
     in

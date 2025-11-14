@@ -3,7 +3,6 @@
   home.packages =
     (with pkgs; [
       fastfetch
-      nixd
       nixfmt-rfc-style
       openssl
       python314
@@ -19,6 +18,7 @@
     ++ [
       pkgsUnstable.codex
       pkgsUnstable.claude-code
+      pkgsUnstable.nixd
     ];
 
   programs.starship = {
