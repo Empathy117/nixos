@@ -1,4 +1,9 @@
-{ pkgs, pkgsUnstable, config, ... }:
+{
+  pkgs,
+  pkgsUnstable,
+  config,
+  ...
+}:
 let
   unstableKernelPackages = pkgsUnstable.linuxPackagesFor config.boot.kernelPackages.kernel;
 in
