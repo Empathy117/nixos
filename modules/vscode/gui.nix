@@ -1,4 +1,9 @@
-{ config, pkgs, lib, ... }:
+{
+  config,
+  pkgs,
+  lib,
+  ...
+}:
 
 let
   inherit (lib) mkMerge;
@@ -13,10 +18,11 @@ in
     package =
       (pkgs.vscode-with-extensions.override {
         vscodeExtensions = sharedExtensions;
-      }).overrideAttrs (_: {
-        pname = "vscode";
-        version = pkgs.vscode.version;
-      });
+      }).overrideAttrs
+        (_: {
+          pname = "vscode";
+          version = pkgs.vscode.version;
+        });
     userSettings = sharedSettings;
   };
 }

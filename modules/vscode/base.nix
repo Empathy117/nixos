@@ -2,7 +2,8 @@
   lib,
   pkgs,
   ...
-}: let
+}:
+let
   settings = import ../../home/vscode/settings.nix;
 
   vscodeExtensions = with pkgs.vscode-extensions; [
@@ -40,11 +41,13 @@
     name = ext.vscodeExtName;
     version = ext.version;
     uniqueId =
-      if ext ? vscodeExtUniqueId && ext.vscodeExtUniqueId != null
-      then ext.vscodeExtUniqueId
-      else "${ext.vscodeExtPublisher}.${ext.vscodeExtName}";
+      if ext ? vscodeExtUniqueId && ext.vscodeExtUniqueId != null then
+        ext.vscodeExtUniqueId
+      else
+        "${ext.vscodeExtPublisher}.${ext.vscodeExtName}";
   };
-in {
+in
+{
   options.shared.vscode = {
     extensions = lib.mkOption {
       type = lib.types.listOf lib.types.package;

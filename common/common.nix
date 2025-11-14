@@ -1,9 +1,13 @@
 # common/common.nix
-{...}: {
+{ ... }:
+{
   # --- 联网与镜像 (所有机器都需要) ---
   nix = {
     settings = {
-      experimental-features = ["nix-command" "flakes"];
+      experimental-features = [
+        "nix-command"
+        "flakes"
+      ];
 
       auto-optimise-store = true;
 

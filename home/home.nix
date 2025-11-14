@@ -3,7 +3,8 @@
   pkgs,
   pkgsUnstable,
   ...
-}: {
+}:
+{
   home.stateVersion = "25.05";
 
   home.packages = with pkgs; [
@@ -63,8 +64,10 @@
       user = "git";
       identitiesOnly = true;
 
-      extraOptions = {AddressFamily = "inet";};
-      identityFile = ["~/.ssh/id_ed25519"];
+      extraOptions = {
+        AddressFamily = "inet";
+      };
+      identityFile = [ "~/.ssh/id_ed25519" ];
     };
     matchBlocks."gitee.com" = {
       hostname = "ssh.gitee.com";
@@ -72,8 +75,10 @@
       user = "git";
       identitiesOnly = true;
 
-      extraOptions = {AddressFamily = "inet";};
-      identityFile = ["~/.ssh/id_ed25519"];
+      extraOptions = {
+        AddressFamily = "inet";
+      };
+      identityFile = [ "~/.ssh/id_ed25519" ];
     };
   };
   services.ssh-agent.enable = true;

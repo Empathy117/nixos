@@ -1,6 +1,7 @@
 let
   workspaceFolderLiteral = "$" + "{workspaceFolder}";
-in {
+in
+{
   "editor.formatOnSave" = true;
   "git.autofetch" = true;
   "nix.enableLanguageServer" = true;
@@ -10,7 +11,7 @@ in {
     # check https://github.com/nix-community/nixd/blob/main/nixd/docs/configuration.md for all nixd config
     "nixd" = {
       "formatting" = {
-        "command" = ["nixfmt"];
+        "command" = [ "nixfmt" ];
       };
       "options" = {
         # By default, this entry will be read from `import <nixpkgs> { }`.
@@ -24,7 +25,8 @@ in {
         };
         # Tip: use ${workspaceFolder} variable to define path
         "nix-darwin" = {
-          "expr" = "(builtins.getFlake \"${workspaceFolderLiteral}/path/to/flake\").darwinConfigurations.<name>.options";
+          "expr" =
+            "(builtins.getFlake \"${workspaceFolderLiteral}/path/to/flake\").darwinConfigurations.<name>.options";
         };
       };
     };

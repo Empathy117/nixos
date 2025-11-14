@@ -4,8 +4,9 @@
   lib,
   pkgs,
   ...
-}: {
-  home.activation.ensureSshKey = lib.hm.dag.entryAfter ["writeBoundary"] ''
+}:
+{
+  home.activation.ensureSshKey = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
     set -euo pipefail
     umask 077
     key="$HOME/.ssh/id_ed25519"
