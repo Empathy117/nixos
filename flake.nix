@@ -114,6 +114,15 @@
           };
         };
 
+        lenovo-live = {
+          enable = true;
+          system = "x86_64-linux";
+          systemModules = [
+            ./hosts/lenovo-live.nix
+          ];
+          homeModules = { };
+        };
+
       };
 
       mkNixosHost =
