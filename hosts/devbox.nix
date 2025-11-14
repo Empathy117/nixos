@@ -12,9 +12,13 @@
 
   services.mihomo = {
     enable = true;
-    # configFile = "";
-    # tunMode = true;
+    configFile = "/etc/mihomo/config.yaml";
+    tunMode = true;
   };
+
+  environment.etc."mihomo/config.yaml".text = ''
+    # placeholder – scp your real config to /etc/mihomo/config.yaml
+  '';
 
   users.users.empathy = {
     isNormalUser = true;
