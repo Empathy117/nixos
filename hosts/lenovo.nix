@@ -1,8 +1,13 @@
-{ pkgs, config, ... }:
+{
+  pkgs,
+  pkgsUnstable,
+  config,
+  ...
+}:
 {
   hardware.firmware = [
     pkgs.linux-firmware
-    pkgs.rtl8761fw
+    pkgsUnstable.rtl8761fw
   ];
   boot.extraModulePackages = with config.boot.kernelPackages; [ rtl8812au-aircrack ];
   services.udev.extraRules = ''
