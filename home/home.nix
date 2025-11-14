@@ -8,6 +8,7 @@ _: {
     ../modules/home/ssh.nix
     ../modules/home/ssh-key.nix
     ../modules/home/nixvim.nix
+    ../modules/home/zsh.nix
   ];
 
 }

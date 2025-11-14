@@ -2,24 +2,6 @@
 {
   networking.hostName = "devbox";
 
-  programs.zsh = {
-    enable = true;
-    autosuggestions = {
-      enable = true;
-    };
-    syntaxHighlighting = {
-      enable = true;
-    };
-    enableCompletion = true;
-    initExtra = '''';
-    history = {
-      size = 10000;
-      save = 10000;
-      share = true;
-      ignoreDuplicates = true;
-    };
-  };
-
   services.openssh = {
     enable = true;
     settings = {
