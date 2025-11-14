@@ -1,6 +1,5 @@
 # hosts/wsl.nix
-_:
-{
+_: {
   wsl.enable = true;
   wsl.defaultUser = "nixos";
 

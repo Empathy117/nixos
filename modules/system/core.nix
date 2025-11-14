@@ -1,6 +1,5 @@
 # modules/system/core.nix
-_: 
-{
+_: {
   # --- 联网与镜像 (所有机器都需要) ---
   nix = {
     settings = {

@@ -1,4 +1,3 @@
-_:
-{
+_: {
   services.vscode-server.enable = true;
 }

@@ -11,8 +11,7 @@
       enable = true;
     };
     enableCompletion = true;
-    initExtra = ''
-    '';
+    initExtra = '''';
     history = {
       size = 10000;
       save = 10000;

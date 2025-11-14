@@ -1,6 +1,9 @@
 { pkgs, config, ... }:
 {
-  hardware.firmware = [ pkgs.linux-firmware pkgs.rtl8761fw ];
+  hardware.firmware = [
+    pkgs.linux-firmware
+    pkgs.rtl8761fw
+  ];
   boot.extraModulePackages = with config.boot.kernelPackages; [ rtl8812au-aircrack ];
   services.udev.extraRules = ''
     SUBSYSTEM=="usb", ATTR{idVendor}=="0bda", ATTR{idProduct}=="1a2b", ENV{UDISKS_IGNORE}="1", ENV{UDISKS_AUTO}="0"
