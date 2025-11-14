@@ -1,15 +1,15 @@
-{
-  pkgs,
-  pkgsUnstable,
-  config,
-  ...
-}:
+{ pkgs, pkgsUnstable, config, ... }:
+let
+  unstableKernelPackages = pkgsUnstable.linuxPackagesFor config.boot.kernelPackages.kernel;
+in
 {
   hardware.firmware = [
     pkgs.linux-firmware
-    pkgsUnstable.rtl8761fw
+    # pkgsUnstable.rtl8761fw # not yet in nixpkgs; re-enable once upstream merges
   ];
-  boot.extraModulePackages = with config.boot.kernelPackages; [ rtl8812au-aircrack ];
+  boot.extraModulePackages = [
+    unstableKernelPackages.rtl88xxau-aircrack
+  ];
   services.udev.extraRules = ''
     SUBSYSTEM=="usb", ATTR{idVendor}=="0bda", ATTR{idProduct}=="1a2b", ENV{UDISKS_IGNORE}="1", ENV{UDISKS_AUTO}="0"
   '';
