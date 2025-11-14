@@ -37,12 +37,11 @@
     };
     lib = nixpkgs.lib;
     repoSrc = lib.cleanSource ./.;
-    mkCheck =
-      name: toolInputs: command:
-        pkgsStable.runCommand name {buildInputs = toolInputs;} ''
-          ${command}
-          touch $out
-        '';
+    mkCheck = name: toolInputs: command:
+      pkgsStable.runCommand name {buildInputs = toolInputs;} ''
+        ${command}
+        touch $out
+      '';
   in {
     # WSL: NixOS 集成 Home Manager
     nixosConfigurations.wsl = nixpkgs.lib.nixosSystem {

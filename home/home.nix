@@ -16,7 +16,7 @@
     direnv
     statix
     deadnix
-    alejandra
+    nixfmt-rfc-style
     pkgsUnstable.codex
   ];
 
