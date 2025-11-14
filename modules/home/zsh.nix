@@ -3,16 +3,14 @@
   programs.zsh = {
     enable = true;
     enableCompletion = true;
+    enableAutosuggestions = true;
+    enableSyntaxHighlighting = true;
 
-    autosuggestions.enable = true;
-    syntaxHighlighting.enable = true;
+    history.size = 10000;
 
-    history = {
-      size = 10000;
-      save = 10000;
-      share = true;
-      ignoreDups = true;
-      extended = true;
-    };
+    initExtraFirst = ''
+      setopt SHARE_HISTORY HIST_IGNORE_DUPS HIST_IGNORE_SPACE EXTENDED_HISTORY
+      HISTFILESIZE=10000
+    '';
   };
 }
