@@ -5,6 +5,10 @@
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-25.05";
     nixpkgs-unstable.url = "github:NixOS/nixpkgs/nixos-unstable";
+    nixvim = {
+      url = "github:nix-community/nixvim";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
     home-manager = {
       url = "github:nix-community/home-manager/release-25.05";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -22,6 +26,7 @@
     nixpkgs,
     nixpkgs-unstable,
     home-manager,
+    nixvim,
     nixos-wsl,
     nixos-vscode-server,
     ...
@@ -61,6 +66,7 @@
           ];
           homeModules = {
             nixos = [
+              nixvim.homeManagerModules.default
               ./home/home.nix
               ./home/vscode
             ];
@@ -77,12 +83,32 @@
           ];
           homeModules = {
             empathy = [
+              nixvim.homeManagerModules.default
               ./home/home.nix
               ./home/vscode
             ];
           };
         };
+
+        lenovo = {
+          enable = true;
+          system = "x86_64-linux";
+          systemModules = [
+            ./hosts/devbox.nix      
+            ./hosts/lenovo.nix      # 叠加该主机特有配置
+            nixos-vscode-server.nixosModules.default
+            ./modules/system/vscode-remote.nix
+          ];
+          homeModules = {
+            empathy = [
+              nixvim.homeManagerModules.default
+              ./home/home.nix
+              ./home/vscode
+            ];
+          };
         };
+
+      };
 
       mkNixosHost = name: cfg:
         let
@@ -132,6 +158,7 @@
           (_: {
             nixpkgs.config.allowUnfree = true;
           })
+          nixvim.homeManagerModules.default
           ./home/home.nix
           ./modules/vscode/gui.nix
         ];
