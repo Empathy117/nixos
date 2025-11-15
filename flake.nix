@@ -1,24 +1,36 @@
 # flake.nix
 {
-  description = "My NixOS configuration";
+  description = "模块化的 NixOS + Home Manager 配置，支持多主机管理";
 
   inputs = {
+    # 稳定版 nixpkgs - 系统默认使用
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-25.05";
+    
+    # 不稳定版 nixpkgs - 仅用于需要最新特性的包
     nixpkgs-unstable.url = "github:NixOS/nixpkgs/nixos-unstable";
+    
+    # Neovim 配置框架
     nixvim = {
       url = "github:nix-community/nixvim";
       inputs.nixpkgs.follows = "nixpkgs-unstable";
     };
+    
+    # Home Manager - 用户环境管理
     home-manager = {
       url = "github:nix-community/home-manager/release-25.05";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    
+    # VS Code Server 支持
     nixos-vscode-server = {
       url = "github:nix-community/nixos-vscode-server";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    
+    # WSL 支持
     nixos-wsl = {
       url = "github:nix-community/NixOS-WSL";
+      inputs.nixpkgs.follows = "nixpkgs";
     };
   };
 
@@ -60,7 +72,14 @@
           touch $out
         '';
 
+      # 主机定义 - 数据驱动的配置方式
+      # 每个主机定义包含：
+      # - enable: 是否启用该配置
+      # - system: 系统架构
+      # - systemModules: NixOS 系统级模块列表
+      # - homeModules: Home Manager 用户级模块（按用户名分组）
       hostDefs = {
+        # WSL2 环境配置
         wsl = {
           enable = true;
           system = "x86_64-linux";
@@ -79,8 +98,9 @@
           };
         };
 
+        # 开发服务器基线配置（作为模板）
         devbox = {
-          enable = false;
+          enable = false; # 设为 true 以启用
           system = "x86_64-linux";
           systemModules = [
             ./hosts/devbox.nix
@@ -96,12 +116,13 @@
           };
         };
 
+        # Lenovo 笔记本配置（继承 devbox 基线 + 特定硬件配置）
         lenovo = {
           enable = true;
           system = "x86_64-linux";
           systemModules = [
-            ./hosts/devbox.nix
-            ./hosts/lenovo/lenovo.nix # 叠加该主机特有配置
+            ./hosts/devbox.nix # 基线配置
+            ./hosts/lenovo/lenovo.nix # 硬件特定配置
             nixos-vscode-server.nixosModules.default
             ./modules/system/vscode-remote.nix
           ];
@@ -113,7 +134,6 @@
             ];
           };
         };
-
       };
 
       mkNixosHost =
