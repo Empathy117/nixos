@@ -19,7 +19,7 @@ in
     SUBSYSTEM=="usb", ATTR{idVendor}=="0bda", ATTR{idProduct}=="1a2b", ENV{UDISKS_IGNORE}="1", ENV{UDISKS_AUTO}="0"
   '';
   environment.etc."wifi/auth.sh" = {
-    source = ../scripts/auth.sh;
+    source = ../../scripts/auth.sh;
     mode = "0555";
   };
 

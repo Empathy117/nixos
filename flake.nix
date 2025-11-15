@@ -66,7 +66,7 @@
           system = "x86_64-linux";
           systemModules = [
             nixos-wsl.nixosModules.default
-            ./hosts/wsl.nix
+            ./hosts/wsl/wsl.nix
             nixos-vscode-server.nixosModules.default
             ./modules/system/vscode-remote.nix
           ];
@@ -101,7 +101,7 @@
           system = "x86_64-linux";
           systemModules = [
             ./hosts/devbox.nix
-            ./hosts/lenovo.nix # 叠加该主机特有配置
+            ./hosts/lenovo/lenovo.nix # 叠加该主机特有配置
             nixos-vscode-server.nixosModules.default
             ./modules/system/vscode-remote.nix
           ];
@@ -112,15 +112,6 @@
               ./home/vscode
             ];
           };
-        };
-
-        lenovo-live = {
-          enable = true;
-          system = "x86_64-linux";
-          systemModules = [
-            ./hosts/lenovo-live.nix
-          ];
-          homeModules = { };
         };
 
       };
