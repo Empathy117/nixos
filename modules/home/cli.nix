@@ -1,52 +1,104 @@
+# modules/home/cli.nix
+#
+# CLI 工具和终端增强配置
+#
+# 包含：
+# - 常用命令行工具
+# - 现代化的 Unix 工具替代品（eza, bat, ripgrep 等）
+# - Shell 增强（starship, zoxide, fzf, atuin）
+# - 开发环境管理（direnv）
+#
+# 设计原则：
+# - 稳定版包从 pkgs 获取
+# - 需要最新特性的包从 pkgsUnstable 获取
 { pkgs, pkgsUnstable, ... }:
 {
+  # ============================================================================
+  # 软件包安装
+  # ============================================================================
   home.packages =
+    # 稳定版包
     (with pkgs; [
-      fastfetch
-      nixfmt-rfc-style
-      openssl
-      python314
-      statix
-      vim
-      wget
-      deadnix
-      eza
-      bat
-      lf
-      ripgrep
+      # 系统信息
+      fastfetch # 系统信息展示（neofetch 的现代替代）
+      
+      # Nix 工具
+      nixfmt-rfc-style # Nix 代码格式化
+      statix # Nix 静态分析
+      deadnix # 检测未使用的 Nix 代码
+      
+      # 开发工具
+      openssl # 加密库和工具
+      python314 # Python 解释器
+      vim # 文本编辑器
+      wget # 文件下载
+      
+      # 现代化 Unix 工具
+      eza # ls 的现代替代（彩色输出、图标）
+      bat # cat 的现代替代（语法高亮）
+      lf # 终端文件管理器
+      ripgrep # grep 的现代替代（更快的搜索）
     ])
+    # 不稳定版包 - 需要最新特性
     ++ [
-      pkgsUnstable.codex
-      pkgsUnstable.claude-code
-      pkgsUnstable.nixd
+      pkgsUnstable.codex # AI 代码助手
+      pkgsUnstable.claude-code # Claude AI 集成
+      pkgsUnstable.nixd # Nix 语言服务器
     ];
 
+  # ============================================================================
+  # Shell 提示符 - Starship
+  # ============================================================================
   programs.starship = {
     enable = true;
     enableZshIntegration = true;
+    # 配置可以在这里添加
+    # settings = { ... };
   };
 
+  # ============================================================================
+  # 智能目录跳转 - Zoxide
+  # ============================================================================
   programs.zoxide = {
     enable = true;
     enableZshIntegration = true;
+    # 使用 'z' 命令快速跳转到常用目录
   };
 
+  # ============================================================================
+  # 模糊查找 - FZF
+  # ============================================================================
   programs.fzf = {
     enable = true;
     enableZshIntegration = true;
+    # Ctrl+R: 搜索历史
+    # Ctrl+T: 搜索文件
+    # Alt+C: 切换目录
   };
 
+  # ============================================================================
+  # Shell 历史管理 - Atuin
+  # ============================================================================
   programs.atuin = {
     enable = true;
     enableZshIntegration = true;
+    # 提供更强大的历史搜索和同步功能
   };
 
+  # ============================================================================
+  # 环境管理 - Direnv
+  # ============================================================================
   programs.direnv = {
     enable = true;
     nix-direnv.enable = true;
+    # 自动加载项目特定的环境变量和 Nix shell
   };
 
+  # ============================================================================
+  # 环境变量
+  # ============================================================================
   home.sessionVariables = {
+    # 禁用 FZF 的 Ctrl+R（由 Atuin 接管）
     FZF_CTRL_R_COMMAND = "";
   };
 }
