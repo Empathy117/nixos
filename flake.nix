@@ -188,9 +188,46 @@
         ];
       };
 
+      # 代码质量检查
       checks.${defaultSystem} = {
         statix = mkCheck "statix-check" [ pkgsDefault.statix ] "statix check ${repoSrc}";
         deadnix = mkCheck "deadnix-check" [ pkgsDefault.deadnix ] "deadnix --fail ${repoSrc}";
       };
+
+      # 开发环境
+      devShells.${defaultSystem} = {
+        # 默认开发环境 - 用于维护此配置仓库
+        default = pkgsDefault.mkShell {
+          name = "nixos-config-dev";
+          
+          buildInputs = with pkgsDefault; [
+            # Nix 工具
+            nixfmt-rfc-style # Nix 代码格式化
+            statix # 静态分析
+            deadnix # 死代码检测
+            nil # Nix LSP
+            
+            # 版本控制
+            git
+            
+            # 文档工具
+            mdbook # 如果需要构建文档
+          ];
+          
+          shellHook = ''
+            echo "🚀 NixOS 配置开发环境"
+            echo ""
+            echo "可用命令："
+            echo "  nixfmt <file>     - 格式化 Nix 文件"
+            echo "  statix check .    - 运行静态分析"
+            echo "  deadnix .         - 检测未使用的代码"
+            echo "  nix flake check   - 运行所有检查"
+            echo ""
+          '';
+        };
+      };
+
+      # 格式化器配置
+      formatter.${defaultSystem} = pkgsDefault.nixfmt-rfc-style;
     };
 }
