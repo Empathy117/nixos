@@ -34,5 +34,4 @@
     vlock
   ];
 
-  virtualisation.docker.enable = true;
 }

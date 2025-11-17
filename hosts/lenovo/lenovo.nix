@@ -56,10 +56,11 @@ in
   networking.firewall = {
     enable = true; # 如果原来就是 true 可不写
     allowedTCPPorts = [
-      7890   # mixed port
-      9090   # mihomo 控制端（Web UI）
-      8081   # nexus
+      7890 # mixed port
+      9090 # mihomo 控制端（Web UI）
+      8081 # nexus
     ];
     # allowedUDPPorts = [ 7890 ];  # 需要 UDP 时再开启
   };
+
 }
