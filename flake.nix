@@ -3,8 +3,18 @@
   description = "My NixOS configuration";
 
   inputs = {
-    nixpkgs.url = "github:NixOS/nixpkgs/nixos-25.05";
-    nixpkgs-unstable.url = "github:NixOS/nixpkgs/nixos-unstable";
+    nixpkgs = {
+      url = "github:NixOS/nixpkgs/nixos-25.05";
+    };
+    nixpkgs-unstable = {
+      url = "github:NixOS/nixpkgs/nixos-unstable";
+    };
+    nur = {
+      url = "github:nix-community/NUR";
+    };
+    nixos-wsl = {
+      url = "github:nix-community/NixOS-WSL";
+    };
     nixvim = {
       url = "github:nix-community/nixvim";
       inputs.nixpkgs.follows = "nixpkgs-unstable";
@@ -17,15 +27,13 @@
       url = "github:nix-community/nixos-vscode-server";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-    nixos-wsl = {
-      url = "github:nix-community/NixOS-WSL";
-    };
   };
 
   outputs =
     {
       nixpkgs,
       nixpkgs-unstable,
+      nur,
       home-manager,
       nixvim,
       nixos-wsl,
@@ -41,12 +49,14 @@
         import nixpkgs {
           inherit system;
           config.allowUnfree = true;
+          overlays = [ nur.overlay ];
         };
       mkPkgsUnstable =
         system:
         import nixpkgs-unstable {
           inherit system;
           config.allowUnfree = true;
+          overlays = [ nur.overlay ];
         };
 
       pkgsDefault = mkPkgs defaultSystem;
@@ -120,11 +130,12 @@
         name: cfg:
         let
           system = cfg.system or defaultSystem;
+          pkgs = mkPkgs system;
           pkgsUnstable = mkPkgsUnstable system;
           homeModules = cfg.homeModules or { };
         in
         lib.nixosSystem {
-          inherit system;
+          inherit system pkgs;
           specialArgs = {
             inherit pkgsUnstable;
           }
