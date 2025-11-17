@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 ################################################################################
 # Portal 认证脚本 - 纯 Bash + curl + openssl
 # 依赖：curl、openssl、xxd、python3（解析验证码 JSON）
