@@ -8,14 +8,12 @@ let
   aic8800d80-driver = config.boot.kernelPackages.callPackage ./aic8800d80-driver.nix { };
 in
 {
-  hardware.firmware = [
-    pkgs.linux-firmware
-  ];
+  hardware.firmware = [ pkgs.linux-firmware ];
   
   boot.kernelPackages = pkgs.linuxPackages;
   
   boot.extraModulePackages = [
-    aic8800d80-driver
+    aic8800d80-driver  # 包含驱动和固件
   ];
   
   # 启用 usb_modeswitch 来切换 USB 网卡模式
