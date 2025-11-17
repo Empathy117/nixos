@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 ################################################################################
 # Portal 认证脚本 - 纯 Bash + curl + openssl
 # 依赖：curl、openssl、xxd、python3（解析验证码 JSON）
@@ -47,8 +47,15 @@ debug(){
     fi
 }
 
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PUB_KEY="${SCRIPT_DIR}/portal_pub.pem"
+
 rsa_encrypt() {
-    printf '%s' "$1" | openssl rsautl -encrypt -pubin -inkey portal_pub.pem | base64 -w0
+    if [ ! -f "$PUB_KEY" ]; then
+        error "找不到公钥文件: $PUB_KEY"
+        return 1
+    fi
+    printf '%s' "$1" | openssl pkeyutl -encrypt -pubin -inkey "$PUB_KEY" -pkeyopt rsa_padding_mode:pkcs1 | base64 -w0
 }
 TOKEN_HEADER="Token: $(rsa_encrypt 'JXU1M0QxJXU2NDkyJ!XU1NzMwJXU2NUI')"
 

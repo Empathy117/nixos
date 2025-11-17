@@ -28,10 +28,13 @@ stdenv.mkDerivation rec {
     mkdir -p $out/lib/modules/${kernel.modDirVersion}/kernel/drivers/net/wireless/aic8800
     find . -name '*.ko' -exec cp {} $out/lib/modules/${kernel.modDirVersion}/kernel/drivers/net/wireless/aic8800/ \;
     
-    # 安装固件
+    # 安装固件（不压缩）
     mkdir -p $out/lib/firmware
     cp -r ../../fw/aic8800D80 $out/lib/firmware/
   '';
+  
+  # 禁用固件压缩
+  compressFirmware = false;
 
   meta = with lib; {
     description = "AIC8800D80 WiFi driver for Linux (Tenda U11, AX913B)";
