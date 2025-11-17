@@ -1,34 +1,43 @@
 {
   pkgs,
-  pkgsUnstable,
   config,
   ...
 }:
 let
-  unstableKernelPackages = pkgsUnstable.linuxPackagesFor config.boot.kernelPackages.kernel;
+  aic8800d80-driver = config.boot.kernelPackages.callPackage ./aic8800d80-driver.nix { };
 in
 {
+  imports = [
+    ./hardware-configuration.nix
+  ];
   hardware.firmware = [
     pkgs.linux-firmware
-    # pkgsUnstable.rtl8761fw # not yet in nixpkgs; re-enable once upstream merges
+    aic8800d80-driver
   ];
+  networking.networkmanager.enable = true;
+  #hardware.firmware.compression = "none";
+  boot.kernelPackages = pkgs.linuxPackages;
   boot.extraModulePackages = [
-    unstableKernelPackages.rtl88xxau-aircrack
+    aic8800d80-driver
   ];
-  services.udev.extraRules = ''
-    SUBSYSTEM=="usb", ATTR{idVendor}=="0bda", ATTR{idProduct}=="1a2b", ENV{UDISKS_IGNORE}="1", ENV{UDISKS_AUTO}="0"
+  environment.systemPackages = with pkgs; [
+    usbutils
+    pciutils
+    iw
+    wirelesstools
+    usb-modeswitch
+    gcc
+    gnumake
+    config.boot.kernelPackages.kernel.dev
+    wpa_supplicant
+  ];
+  hardware.enableRedistributableFirmware = true;
+  services.udev.packages = [ pkgs.usb-modeswitch-data ];
+  system.activationScripts.auc8800D80-firmware = ''
+    mkdir -p /lib
+    ln -sfn /run/current-system/firmware /lib/firmware
   '';
-  environment.etc."wifi/auth.sh" = {
-    source = ../../scripts/auth.sh;
-    mode = "0555";
-  };
-
-  systemd.services.corp-auth = {
-    description = "Campus Wi-Fi bootstrap";
-    wantedBy = [ "multi-user.target" ];
-    serviceConfig = {
-      Type = "oneshot";
-      ExecStart = "${pkgs.bash}/bin/bash /etc/wifi/auth.sh";
-    };
-  };
+  services.udev.extraRules = ''
+    SUBSYSTEM=="usb", ATTR{idVendor}=="a69c", ATTR{idProduct}=="5725", RUN+="${pkgs.usb-modeswitch}/bin/usb_modeswitch -v a69c -p 5725 -K"
+  '';
 }
