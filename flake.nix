@@ -9,6 +9,9 @@
     # 不稳定版 nixpkgs - 仅用于需要最新特性的包
     nixpkgs-unstable.url = "github:NixOS/nixpkgs/nixos-unstable";
     
+    # NUR - Nix User Repository
+    nur.url = "github:nix-community/NUR";
+    
     # Neovim 配置框架
     nixvim = {
       url = "github:nix-community/nixvim";
@@ -38,6 +41,7 @@
     {
       nixpkgs,
       nixpkgs-unstable,
+      nur,
       home-manager,
       nixvim,
       nixos-wsl,
@@ -53,12 +57,14 @@
         import nixpkgs {
           inherit system;
           config.allowUnfree = true;
+          overlays = [ nur.overlay ];
         };
       mkPkgsUnstable =
         system:
         import nixpkgs-unstable {
           inherit system;
           config.allowUnfree = true;
+          overlays = [ nur.overlay ];
         };
 
       pkgsDefault = mkPkgs defaultSystem;
@@ -140,11 +146,12 @@
         name: cfg:
         let
           system = cfg.system or defaultSystem;
+          pkgs = mkPkgs system;
           pkgsUnstable = mkPkgsUnstable system;
           homeModules = cfg.homeModules or { };
         in
         lib.nixosSystem {
-          inherit system;
+          inherit system pkgs;
           specialArgs = {
             inherit pkgsUnstable;
           }
