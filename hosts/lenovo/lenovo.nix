@@ -15,11 +15,11 @@ in
     aic8800d80-driver
   ];
   networking.networkmanager.enable = true;
-  #hardware.firmware.compression = "none";
   boot.kernelPackages = pkgs.linuxPackages;
   boot.extraModulePackages = [
     aic8800d80-driver
   ];
+
   environment.systemPackages = with pkgs; [
     usbutils
     pciutils
@@ -31,6 +31,18 @@ in
     config.boot.kernelPackages.kernel.dev
     wpa_supplicant
   ];
+
+  services.mihomo = {
+    enable = true;
+    configFile = "/etc/mihomo/config.yaml";
+    tunMode = true;
+  };
+  # environment.etc."mihomo/config.yaml".text = ''
+  #   # placeholder – scp your real config to /etc/mihomo/config.yaml
+  # '';
+  environment.etc."mihomo/config.yaml".source = "/home/empathy/.mihomo/config.yaml";
+  services.mihomo.webui = pkgs.metacubexd;
+
   hardware.enableRedistributableFirmware = true;
   services.udev.packages = [ pkgs.usb-modeswitch-data ];
   system.activationScripts.auc8800D80-firmware = ''
