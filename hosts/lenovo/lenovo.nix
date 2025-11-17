@@ -35,7 +35,7 @@ in
   services.mihomo = {
     enable = true;
     configFile = "/etc/mihomo/config.yaml";
-    tunMode = true;
+    tunMode = false;
   };
   # environment.etc."mihomo/config.yaml".text = ''
   #   # placeholder – scp your real config to /etc/mihomo/config.yaml
@@ -52,4 +52,13 @@ in
   services.udev.extraRules = ''
     SUBSYSTEM=="usb", ATTR{idVendor}=="a69c", ATTR{idProduct}=="5725", RUN+="${pkgs.usb-modeswitch}/bin/usb_modeswitch -v a69c -p 5725 -K"
   '';
+
+  networking.firewall = {
+    enable = true; # 如果原来就是 true 可不写
+    allowedTCPPorts = [
+      7890   # mixed port
+      9090   # mihomo 控制端（Web UI）
+    ];
+    # allowedUDPPorts = [ 7890 ];  # 需要 UDP 时再开启
+  };
 }
