@@ -5,7 +5,7 @@
   ...
 }:
 let
-  aic8800-driver = config.boot.kernelPackages.callPackage ./aic8800-driver.nix { };
+  aic8800d80-driver = config.boot.kernelPackages.callPackage ./aic8800d80-driver.nix { };
 in
 {
   hardware.firmware = [
@@ -15,7 +15,7 @@ in
   boot.kernelPackages = pkgs.linuxPackages;
   
   boot.extraModulePackages = [
-    aic8800-driver
+    aic8800d80-driver
   ];
   
   # 启用 usb_modeswitch 来切换 USB 网卡模式
@@ -24,19 +24,20 @@ in
   
   # 添加网络调试工具和编译工具
   environment.systemPackages = with pkgs; [
-    usbutils # lsusb
-    pciutils # lspci
-    iw # 无线网络工具
-    wirelesstools # iwconfig 等
+    usbutils
+    pciutils
+    iw
+    wirelesstools
+    usb-modeswitch
     gcc
     gnumake
     git
-    config.boot.kernelPackages.kernel.dev
-    pkgs.linuxPackages_6_6.kernel.dev # kernel headers
   ];
   
+  # AIC8800 USB 模式切换规则
   services.udev.extraRules = ''
-    SUBSYSTEM=="usb", ATTR{idVendor}=="0bda", ATTR{idProduct}=="1a2b", ENV{UDISKS_IGNORE}="1", ENV{UDISKS_AUTO}="0"
+    # AIC8800 存储模式 -> 网卡模式
+    SUBSYSTEM=="usb", ATTR{idVendor}=="a69c", ATTR{idProduct}=="5725", RUN+="${pkgs.usb-modeswitch}/bin/usb_modeswitch -v a69c -p 5725 -K"
   '';
   environment.etc."wifi/auth.sh" = {
     source = ../../scripts/auth.sh;
