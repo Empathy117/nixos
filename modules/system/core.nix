@@ -29,6 +29,13 @@ _: {
 
   programs.zsh.enable = true;
 
+  # --- IPv6 ---
+  networking.enableIPv6 = false;
+  boot.kernel.sysctl = {
+    "net.ipv6.conf.all.disable_ipv6" = 1;
+    "net.ipv6.conf.default.disable_ipv6" = 1;
+  };
+
   # --- NixOS 版本锚点 ---
   system.stateVersion = "25.05";
 }

@@ -35,7 +35,7 @@ in
   services.mihomo = {
     enable = true;
     configFile = "/etc/mihomo/config.yaml";
-    tunMode = false;
+    tunMode = true;
   };
   # environment.etc."mihomo/config.yaml".text = ''
   #   # placeholder – scp your real config to /etc/mihomo/config.yaml
@@ -60,6 +60,12 @@ in
       9090 # mihomo 控制端（Web UI）
       8081 # nexus
     ];
+    # 开启tunmode
+    trustedInterfaces = [
+      "mihomo"
+      "Meta"
+    ];
+    checkReversePath = "loose"; # 关键
     # allowedUDPPorts = [ 7890 ];  # 需要 UDP 时再开启
   };
 
