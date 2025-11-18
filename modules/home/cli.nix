@@ -41,11 +41,6 @@
     enableZshIntegration = true;
   };
 
-  programs.direnv = {
-    enable = true;
-    nix-direnv.enable = true;
-  };
-
   home.sessionVariables = {
     FZF_CTRL_R_COMMAND = "";
   };
