@@ -117,14 +117,18 @@ in
         ];
 
         # npm 配置
-        home.file.".npmrc".text = lib.mkIf (cfg.packageManager == "npm") ''
-          prefix=${config.home.homeDirectory}/.npm-global
-        '';
+        home.file.".npmrc" = lib.mkIf (cfg.packageManager == "npm") {
+          text = ''
+            prefix=${config.home.homeDirectory}/.npm-global
+          '';
+        };
 
         # pnpm 配置
-        home.file.".config/pnpm/rc".text = lib.mkIf (cfg.packageManager == "pnpm") ''
-          store-dir=${config.home.homeDirectory}/.local/share/pnpm/store
-        '';
+        home.file.".config/pnpm/rc" = lib.mkIf (cfg.packageManager == "pnpm") {
+          text = ''
+            store-dir=${config.home.homeDirectory}/.local/share/pnpm/store
+          '';
+        };
 
         # 启用 corepack
         home.activation.enableCorepack = lib.mkIf cfg.enableCorepack (
