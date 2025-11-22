@@ -10,6 +10,7 @@ _: {
     ../modules/home/nixvim.nix
     ../modules/home/zsh.nix
     ../modules/home/direnv.nix
+    ../modules/home/nodejs
   ];
 
 }
