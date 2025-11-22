@@ -9,6 +9,9 @@ let
   cfg = config.programs.nodejs;
 in
 {
+  imports = [
+    ./packages.nix  # 自动导入包配置
+  ];
   options.programs.nodejs = {
     enable = lib.mkEnableOption "Node.js development environment";
 

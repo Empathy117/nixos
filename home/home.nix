@@ -35,6 +35,6 @@ _: {
     ../modules/home/zsh.nix
     
     # Node.js 开发环境
-    ./modules/nodejs.nix
+    ../modules/home/nodejs
   ];
 }
