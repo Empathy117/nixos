@@ -14,21 +14,8 @@ fi
 
 cd "${WORKTREE}"
 
-if [ -f "./flake.nix" ]; then
-  echo "[deploy] building Nix-generated config (bsc-config-local)..."
-  nix build .#bsc-config-local || echo "[deploy] warning: nix build .#bsc-config-local failed, continuing"
-
-  if [ -d "./result" ] && [ -d "./bsc-service" ]; then
-    echo "[deploy] syncing config to bsc-service/source-file/local"
-    rm -rf ./bsc-service/source-file/local
-    mkdir -p ./bsc-service/source-file/local
-    cp -r ./result/* ./bsc-service/source-file/local/
-  fi
-fi
-
 echo "[deploy] restarting systemd service: ${SERVICE_NAME}"
 systemctl restart "${SERVICE_NAME}"
 systemctl status "${SERVICE_NAME}" --no-pager || true
 
 echo "[deploy] done."
-

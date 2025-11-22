@@ -84,15 +84,9 @@ in
     baseDir = "/srv/yoohoo";
 
     bsc.instances = {
-      dev = {
+      main = {
         enable = true;
-        # 默认 workingDir = /srv/yoohoo/dev
-        profile = "local";
-      };
-
-      test = {
-        enable = false;
-        # 如需对外演示 / 验证时，可启用并准备 /srv/yoohoo/test
+        # 默认 workingDir = /srv/yoohoo/main
         profile = "local";
       };
     };

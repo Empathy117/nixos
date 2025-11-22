@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-ENV_NAME="test"
+ENV_NAME="main"
 WORKTREE="/srv/yoohoo/${ENV_NAME}"
 SERVICE_NAME="yoohoo-bsc-${ENV_NAME}"
 
@@ -19,3 +19,4 @@ systemctl restart "${SERVICE_NAME}"
 systemctl status "${SERVICE_NAME}" --no-pager || true
 
 echo "[deploy] done."
+
