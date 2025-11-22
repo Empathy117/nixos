@@ -60,6 +60,7 @@ in
         packageManager = lib.mkDefault "pnpm";
         globalPackages = lib.mkDefault [ ];
         installedPackages = lib.mkDefault [ ];
+        enableCorepack = lib.mkDefault false; # 默认禁用防止兼容问题
       };
     }
 
@@ -133,7 +134,9 @@ in
         # 启用 corepack
         home.activation.enableCorepack = lib.mkIf cfg.enableCorepack (
           lib.hm.dag.entryAfter [ "writeBoundary" ] ''
-            $DRY_RUN_CMD ${cfg.package}/bin/corepack enable
+            if [ -f "${cfg.package}/bin/corepack" ]; then
+              $DRY_RUN_CMD ${cfg.package}/bin/corepack enable 2>/dev/null || true
+              fi
           ''
         );
       }
