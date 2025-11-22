@@ -1,4 +1,4 @@
-# NixOS 模块：AIC8800D80 无线网卡支持
+# AIC8800D80 无线网卡支持
 {
   config,
   lib,

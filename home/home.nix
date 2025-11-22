@@ -33,5 +33,8 @@ _: {
     
     # Zsh 配置（历史、补全、高亮）
     ../modules/home/zsh.nix
+    
+    # Node.js 开发环境
+    ./modules/nodejs.nix
   ];
 }

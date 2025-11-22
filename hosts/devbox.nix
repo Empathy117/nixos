@@ -59,5 +59,6 @@
     htop
     docker
     vlock
+    nodejs  # 提供 npm
   ];
 }
