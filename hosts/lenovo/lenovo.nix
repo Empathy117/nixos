@@ -59,6 +59,15 @@ in
       7890 # mixed port
       9090 # mihomo 控制端（Web UI）
       8081 # nexus
+      5326 # dameng
+      6379 # redis
+      2181 # zookeeper
+      9092 # kafka
+      8848 # nacos
+      9848 # nacos
+      9849 # nacos
+      9000 # minio
+      9001 # minio
     ];
     # 开启tunmode
     trustedInterfaces = [
@@ -67,6 +76,26 @@ in
     ];
     checkReversePath = "loose"; # 关键
     # allowedUDPPorts = [ 7890 ];  # 需要 UDP 时再开启
+  };
+
+  # Yoohoo 应用服务（本机开发 / 测试）
+  services.yoohoo = {
+    enable = true;
+    baseDir = "/srv/yoohoo";
+
+    bsc.instances = {
+      dev = {
+        enable = true;
+        # 默认 workingDir = /srv/yoohoo/dev
+        profile = "local";
+      };
+
+      test = {
+        enable = false;
+        # 如需对外演示 / 验证时，可启用并准备 /srv/yoohoo/test
+        profile = "local";
+      };
+    };
   };
 
 }

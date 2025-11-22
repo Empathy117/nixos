@@ -143,6 +143,7 @@
           modules = [
             ./modules/system/core.nix
             ./modules/system/docker.nix
+            ./modules/system/yoohoo-services.nix
             (_: {
               networking.hostName = lib.mkDefault name;
             })
