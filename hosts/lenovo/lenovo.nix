@@ -56,6 +56,7 @@ in
   networking.firewall = {
     enable = true; # 如果原来就是 true 可不写
     allowedTCPPorts = [
+      80   # nginx
       7890 # mixed port
       9090 # mihomo 控制端（Web UI）
       8081 # nexus
@@ -68,6 +69,9 @@ in
       9849 # nacos
       9000 # minio
       9001 # minio
+      8896 # bsc-service
+      8083 # mdm-service
+      8088 # bms-service
     ];
     # 开启tunmode
     trustedInterfaces = [
@@ -86,9 +90,179 @@ in
     bsc.instances = {
       main = {
         enable = true;
-        # 默认 workingDir = /srv/yoohoo/main
+        # 部署工作目录来自 bsc-service 裸仓库
+        workingDir = "/srv/yoohoo/bsc-service";
         profile = "local";
       };
+    };
+
+    mdm.instances = {
+      main = {
+        enable = true;
+        workingDir = "/srv/yoohoo/mdm-service";
+        profile = "local";
+      };
+    };
+
+    bms.instances = {
+      main = {
+        enable = true;
+        workingDir = "/srv/yoohoo/bms-service";
+        profile = "local";
+      };
+    };
+  };
+
+  # 简易 CI/CD：本机多个裸仓库 + 自动部署到各自工作目录
+  services.yoohooDeploy = {
+    enable = true;
+    repoDir = "/srv/git";
+    user = "git";
+    group = "git";
+
+    instances = {
+      # 后端服务仓库
+      bsc-service = {
+        repoName = "bsc-service.git";
+        workTree = "/srv/yoohoo/bsc-service";
+        branch = "master";
+        allowedPushers = [ "empathy" ];
+        postCheckoutCmd = ''
+          systemctl restart yoohoo-bsc-main
+        '';
+      };
+
+      mdm-service = {
+        repoName = "mdm-service.git";
+        workTree = "/srv/yoohoo/mdm-service";
+        branch = "master";
+        allowedPushers = [ "empathy" ];
+        postCheckoutCmd = ''
+          systemctl restart yoohoo-mdm-main
+        '';
+      };
+
+      bms-service = {
+        repoName = "bms-service.git";
+        workTree = "/srv/yoohoo/bms-service";
+        branch = "master";
+        allowedPushers = [ "empathy" ];
+        postCheckoutCmd = ''
+          systemctl restart yoohoo-bms-main
+        '';
+      };
+
+      # 前端仓库：build 后拷贝到 /srv/www 下，供 nginx 使用
+      bsc-frontend = {
+        repoName = "bsc-frontend.git";
+        workTree = "/srv/yoohoo/bsc-frontend";
+        branch = "master";
+        allowedPushers = [ "empathy" ];
+        postCheckoutCmd = ''
+          ${pkgs.pnpm}/bin/pnpm install --frozen-lockfile || ${pkgs.pnpm}/bin/pnpm install
+          ${pkgs.pnpm}/bin/pnpm build:production-no-ts
+
+          mkdir -p /srv/www/yoohoo
+          rm -rf /srv/www/yoohoo/febsc
+          cp -r /srv/yoohoo/bsc-frontend/febsc /srv/www/yoohoo/
+        '';
+      };
+
+      mdm-frontend = {
+        repoName = "mdm-frontend.git";
+        workTree = "/srv/yoohoo/mdm-frontend";
+        branch = "master";
+        allowedPushers = [ "empathy" ];
+        postCheckoutCmd = ''
+          ${pkgs.pnpm}/bin/pnpm install --frozen-lockfile || ${pkgs.pnpm}/bin/pnpm install
+          ${pkgs.pnpm}/bin/pnpm build:production-no-ts
+
+          mkdir -p /srv/www/yoohoo
+          rm -rf /srv/www/yoohoo/femdm
+          cp -r /srv/yoohoo/mdm-frontend/femdm /srv/www/yoohoo/
+        '';
+      };
+
+      bms-frontend = {
+        repoName = "bms-frontend.git";
+        workTree = "/srv/yoohoo/bms-frontend";
+        branch = "master";
+        allowedPushers = [ "empathy" ];
+        postCheckoutCmd = ''
+          ${pkgs.pnpm}/bin/pnpm install --frozen-lockfile || ${pkgs.pnpm}/bin/pnpm install
+          ${pkgs.pnpm}/bin/pnpm build:production-no-ts
+
+          mkdir -p /srv/www
+          rm -rf /srv/www/febms
+          cp -r /srv/yoohoo/bms-frontend/dist /srv/www/febms
+        '';
+      };
+
+      portal-frontend = {
+        repoName = "portal-frontend.git";
+        workTree = "/srv/yoohoo/portal-frontend";
+        branch = "master";
+        allowedPushers = [ "empathy" ];
+        postCheckoutCmd = ''
+          ${pkgs.pnpm}/bin/pnpm install --frozen-lockfile || ${pkgs.pnpm}/bin/pnpm install
+          ${pkgs.pnpm}/bin/pnpm build:production-no-ts
+
+          mkdir -p /srv/www
+          rm -rf /srv/www/portal
+          cp -r /srv/yoohoo/portal-frontend/portal /srv/www/portal
+        '';
+      };
+    };
+  };
+
+  # Nginx 统一入口，代理各个后端与前端静态资源
+  services.nginx = {
+    enable = true;
+    recommendedProxySettings = true;
+    recommendedGzipSettings = true;
+
+    virtualHosts."yoohoo" = {
+      listen = [
+        {
+          addr = "0.0.0.0";
+          port = 80;
+        }
+      ];
+      serverName = "172.16.10.126";
+      root = "/srv/www";
+
+      # 门户前端（portal-frontend），build 输出到 /srv/www/portal
+      locations."/".extraConfig = ''
+        try_files /portal/index.html =404;
+      '';
+
+      locations."/login".extraConfig = ''
+        try_files $uri $uri/ /portal/index.html;
+      '';
+
+      # 门户静态资源
+      locations."/assets/".extraConfig = ''
+        alias /srv/www/portal/assets/;
+      '';
+
+      # 业务前端静态资源
+      locations."/yoohoo/febsc/".extraConfig = ''
+        try_files $uri $uri/ /yoohoo/febsc/index.html;
+      '';
+
+      locations."/yoohoo/femdm/".extraConfig = ''
+        try_files $uri $uri/ /yoohoo/femdm/index.html;
+      '';
+
+      locations."/febms/".extraConfig = ''
+        try_files $uri $uri/ /febms/index.html;
+      '';
+
+      # 后端 API 代理
+      locations."/bsc/".proxyPass = "http://127.0.0.1:8896";
+      locations."/api/".proxyPass = "http://127.0.0.1:8896";
+      locations."/mdm/".proxyPass = "http://127.0.0.1:8083";
+      locations."/bms/".proxyPass = "http://127.0.0.1:8088";
     };
   };
 

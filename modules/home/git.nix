@@ -9,6 +9,18 @@ _: {
       url."ssh://git@gitee.com/".insteadOf = "https://gitee.com/";
       user.email = "empathyyiyiqi@gmail.com";
       user.name = "empathy";
+
+      safe = {
+        directory = [
+          "/srv/git/bsc-service.git"
+          "/srv/git/mdm-service.git"
+          "/srv/git/bms-service.git"
+          "/srv/git/bsc-frontend.git"
+          "/srv/git/mdm-frontend.git"
+          "/srv/git/bms-frontend.git"
+          "/srv/git/portal-frontend.git"
+        ];
+      };
     };
   };
 }

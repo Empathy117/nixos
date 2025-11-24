@@ -16,6 +16,7 @@
       "wheel"
       "networkmanager"
       "docker"
+      "git"
     ];
     shell = pkgs.zsh;
     description = "Primary development account";

@@ -140,14 +140,16 @@
             inherit pkgsUnstable;
           }
           // (cfg.specialArgs or { });
-          modules = [
-            ./modules/system/core.nix
-            ./modules/system/docker.nix
-            ./modules/system/yoohoo-services.nix
-            (_: {
-              networking.hostName = lib.mkDefault name;
-            })
-          ]
+          modules =
+            [
+              ./modules/system/core.nix
+              ./modules/system/docker.nix
+              ./modules/system/yoohoo-services.nix
+              ./modules/system/yoohoo-deploy.nix
+              (_: {
+                networking.hostName = lib.mkDefault name;
+              })
+            ]
           ++ (cfg.systemModules or [ ])
           ++ lib.optionals (homeModules != { }) [
             home-manager.nixosModules.home-manager
