@@ -114,6 +114,7 @@
             ./hosts/lenovo/lenovo.nix # 叠加该主机特有配置
             nixos-vscode-server.nixosModules.default
             ./modules/system/vscode-remote.nix
+            ./modules/system/git-users.nix
           ];
           homeModules = {
             empathy = [

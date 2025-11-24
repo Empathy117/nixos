@@ -162,9 +162,9 @@ in
           ${pkgs.pnpm}/bin/pnpm install --frozen-lockfile || ${pkgs.pnpm}/bin/pnpm install
           ${pkgs.pnpm}/bin/pnpm build:production-no-ts
 
-          mkdir -p /srv/www/yoohoo
-          rm -rf /srv/www/yoohoo/febsc
-          cp -r /srv/yoohoo/bsc-frontend/febsc /srv/www/yoohoo/
+          mkdir -p /srv/www
+          rm -rf /srv/www/febsc
+          cp -r /srv/yoohoo/bsc-frontend/febsc /srv/www/
         '';
       };
 
@@ -177,9 +177,9 @@ in
           ${pkgs.pnpm}/bin/pnpm install --frozen-lockfile || ${pkgs.pnpm}/bin/pnpm install
           ${pkgs.pnpm}/bin/pnpm build:production-no-ts
 
-          mkdir -p /srv/www/yoohoo
-          rm -rf /srv/www/yoohoo/femdm
-          cp -r /srv/yoohoo/mdm-frontend/femdm /srv/www/yoohoo/
+          mkdir -p /srv/www
+          rm -rf /srv/www/femdm
+          cp -r /srv/yoohoo/mdm-frontend/femdm /srv/www/
         '';
       };
 
@@ -246,12 +246,12 @@ in
       '';
 
       # 业务前端静态资源
-      locations."/yoohoo/febsc/".extraConfig = ''
-        try_files $uri $uri/ /yoohoo/febsc/index.html;
+      locations."/febsc/".extraConfig = ''
+        try_files $uri $uri/ /febsc/index.html;
       '';
 
-      locations."/yoohoo/femdm/".extraConfig = ''
-        try_files $uri $uri/ /yoohoo/femdm/index.html;
+      locations."/femdm/".extraConfig = ''
+        try_files $uri $uri/ /femdm/index.html;
       '';
 
       locations."/febms/".extraConfig = ''

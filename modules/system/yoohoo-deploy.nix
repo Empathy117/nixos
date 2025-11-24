@@ -13,7 +13,7 @@ let
         #!/usr/bin/env bash
         set -euo pipefail
 
-        BRANCH=${lib.escapeShellArg instCfg.branch}
+        BRANCH=${lib.escapeShellArg "refs/heads/${instCfg.branch}"}
         ALLOWED_PUSHERS=${lib.escapeShellArg (lib.concatStringsSep " " instCfg.allowedPushers)}
 
         # If no allowed pushers configured, allow all pushes
@@ -67,7 +67,7 @@ in
     user = lib.mkOption {
       type = lib.types.str;
       default = "git";
-      description = "System user that owns the bare repository and receives pushes.";
+      description = "System user that owns the bare repository and receives pushes (also login user for Git access).";
     };
 
     group = lib.mkOption {
@@ -132,12 +132,12 @@ in
     users.groups.${cfg.group} = { };
 
     users.users.${cfg.user} = {
-      isSystemUser = true;
+      isNormalUser = true;
       group = cfg.group;
-      home = cfg.repoDir;
+      home = "/home/${cfg.user}";
       createHome = true;
       shell = pkgs.bashInteractive;
-      description = "Yoohoo Git user (bare repo + hooks)";
+      description = "Git user for Yoohoo bare repositories and hooks";
     };
 
     # Allow the Git user to run each deploy script as root without password
@@ -169,8 +169,11 @@ in
           ${pkgs.git}/bin/git init --bare ${inst.bareRepo}
         fi
 
+        # 确保共享仓库使用 group 共享权限，新文件 group 可写
+        ${pkgs.git}/bin/git -C ${inst.bareRepo} config core.sharedRepository group
+
         chown -R ${cfg.user}:${cfg.group} ${inst.bareRepo}
-        chmod -R 2775 ${inst.bareRepo}
+        chmod -R g+rwX ${inst.bareRepo}
 
         hook="${inst.bareRepo}/hooks/post-receive"
         cat >"$hook" <<'EOF'
