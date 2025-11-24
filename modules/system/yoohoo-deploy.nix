@@ -170,7 +170,8 @@ in
         fi
 
         # 确保共享仓库使用 group 共享权限，新文件 group 可写
-        ${pkgs.git}/bin/git -C ${inst.bareRepo} config core.sharedRepository group
+        # 裸仓库使用 --git-dir 访问；若仓库异常（不是 git repo），忽略该失败避免阻塞激活
+        ${pkgs.git}/bin/git --git-dir=${inst.bareRepo} config core.sharedRepository group || true
 
         chown -R ${cfg.user}:${cfg.group} ${inst.bareRepo}
         chmod -R g+rwX ${inst.bareRepo}

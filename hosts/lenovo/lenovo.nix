@@ -246,14 +246,23 @@ in
       '';
 
       # 业务前端静态资源
+      locations."/febsc".extraConfig = ''
+        return 301 /febsc/;
+      '';
       locations."/febsc/".extraConfig = ''
         try_files $uri $uri/ /febsc/index.html;
       '';
 
+      locations."/femdm".extraConfig = ''
+        return 301 /femdm/;
+      '';
       locations."/femdm/".extraConfig = ''
         try_files $uri $uri/ /femdm/index.html;
       '';
 
+      locations."/febms".extraConfig = ''
+        return 301 /febms/;
+      '';
       locations."/febms/".extraConfig = ''
         try_files $uri $uri/ /febms/index.html;
       '';
