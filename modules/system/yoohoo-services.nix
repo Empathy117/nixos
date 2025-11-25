@@ -95,6 +95,99 @@ let
       }
     else
       { };
+
+  mkRmpInstance =
+    name: instCfg:
+    let
+      serviceName = "yoohoo-rmp-${name}";
+      workingDir = instCfg.workingDir or "${cfg.baseDir}/${name}";
+      profile = instCfg.profile or "local";
+      javaHome = instCfg.javaHome or pkgs.temurin-bin-8;
+      extraEnv = instCfg.extraEnv or [ ];
+    in
+    if instCfg.enable or false then
+      {
+        ${serviceName} = {
+          description = "Yoohoo RMP Service (${name})";
+          wantedBy = [ "multi-user.target" ];
+          after = [ "network.target" ];
+
+          serviceConfig = {
+            WorkingDirectory = workingDir;
+            ExecStart = "${pkgs.bash}/bin/bash -lc 'set -e; chmod +x ./gradlew || true; ./gradlew bootRun -Pprofile=${profile}'";
+            Restart = "on-failure";
+            Environment =
+              [
+                "JAVA_HOME=${javaHome}"
+              ]
+              ++ extraEnv;
+          };
+        };
+      }
+    else
+      { };
+
+  mkOmsInstance =
+    name: instCfg:
+    let
+      serviceName = "yoohoo-oms-${name}";
+      workingDir = instCfg.workingDir or "${cfg.baseDir}/${name}";
+      profile = instCfg.profile or "local";
+      javaHome = instCfg.javaHome or pkgs.temurin-bin-8;
+      extraEnv = instCfg.extraEnv or [ ];
+    in
+    if instCfg.enable or false then
+      {
+        ${serviceName} = {
+          description = "Yoohoo OMS Service (${name})";
+          wantedBy = [ "multi-user.target" ];
+          after = [ "network.target" ];
+
+          serviceConfig = {
+            WorkingDirectory = workingDir;
+            ExecStart = "${pkgs.bash}/bin/bash -lc 'set -e; chmod +x ./gradlew || true; ./gradlew bootRun -Pprofile=${profile}'";
+            Restart = "on-failure";
+            Environment =
+              [
+                "JAVA_HOME=${javaHome}"
+              ]
+              ++ extraEnv;
+          };
+        };
+      }
+    else
+      { };
+
+  mkWmsInstance =
+    name: instCfg:
+    let
+      serviceName = "yoohoo-wms-${name}";
+      workingDir = instCfg.workingDir or "${cfg.baseDir}/${name}";
+      profile = instCfg.profile or "local";
+      javaHome = instCfg.javaHome or pkgs.temurin-bin-8;
+      extraEnv = instCfg.extraEnv or [ ];
+    in
+    if instCfg.enable or false then
+      {
+        ${serviceName} = {
+          description = "Yoohoo WMS Service (${name})";
+          wantedBy = [ "multi-user.target" ];
+          after = [ "network.target" ];
+
+          serviceConfig = {
+            WorkingDirectory = workingDir;
+            ExecStart = "${pkgs.bash}/bin/bash -lc 'set -e; chmod +x ./gradlew || true; ./gradlew bootRun -Pprofile=${profile}'";
+            Restart = "on-failure";
+            Environment =
+              [
+                "JAVA_HOME=${javaHome}"
+              ]
+              ++ extraEnv;
+          };
+        };
+      }
+    else
+      { };
 in
 {
   options.services.yoohoo = {
@@ -225,6 +318,126 @@ in
       default = { };
       description = "BMS service instances keyed by name (e.g. dev, test).";
     };
+
+    rmp.instances = lib.mkOption {
+      type =
+        lib.types.attrsOf (
+          lib.types.submodule (
+            { name, ... }:
+            {
+              options = {
+                enable = lib.mkEnableOption "Enable yoohoo-rmp-${name} instance.";
+
+                workingDir = lib.mkOption {
+                  type = lib.types.path;
+                  default = "${cfg.baseDir}/${name}";
+                  description = "Working directory for yoohoo-rmp-${name}.";
+                };
+
+                profile = lib.mkOption {
+                  type = lib.types.str;
+                  default = "local";
+                  description = "Gradle profile passed as -Pprofile= for this instance.";
+                };
+
+                javaHome = lib.mkOption {
+                  type = lib.types.path;
+                  default = pkgs.temurin-bin-8;
+                  description = "JAVA_HOME for this instance.";
+                };
+
+                extraEnv = lib.mkOption {
+                  type = lib.types.listOf lib.types.str;
+                  default = [ ];
+                  description = "Additional environment variables (KEY=VALUE) for this instance.";
+                };
+              };
+            }
+          )
+        );
+      default = { };
+      description = "RMP service instances keyed by name (e.g. dev, test).";
+    };
+
+    oms.instances = lib.mkOption {
+      type =
+        lib.types.attrsOf (
+          lib.types.submodule (
+            { name, ... }:
+            {
+              options = {
+                enable = lib.mkEnableOption "Enable yoohoo-oms-${name} instance.";
+
+                workingDir = lib.mkOption {
+                  type = lib.types.path;
+                  default = "${cfg.baseDir}/${name}";
+                  description = "Working directory for yoohoo-oms-${name}.";
+                };
+
+                profile = lib.mkOption {
+                  type = lib.types.str;
+                  default = "local";
+                  description = "Gradle profile passed as -Pprofile= for this instance.";
+                };
+
+                javaHome = lib.mkOption {
+                  type = lib.types.path;
+                  default = pkgs.temurin-bin-8;
+                  description = "JAVA_HOME for this instance.";
+                };
+
+                extraEnv = lib.mkOption {
+                  type = lib.types.listOf lib.types.str;
+                  default = [ ];
+                  description = "Additional environment variables (KEY=VALUE) for this instance.";
+                };
+              };
+            }
+          )
+        );
+      default = { };
+      description = "OMS service instances keyed by name (e.g. dev, test).";
+    };
+
+    wms.instances = lib.mkOption {
+      type =
+        lib.types.attrsOf (
+          lib.types.submodule (
+            { name, ... }:
+            {
+              options = {
+                enable = lib.mkEnableOption "Enable yoohoo-wms-${name} instance.";
+
+                workingDir = lib.mkOption {
+                  type = lib.types.path;
+                  default = "${cfg.baseDir}/${name}";
+                  description = "Working directory for yoohoo-wms-${name}.";
+                };
+
+                profile = lib.mkOption {
+                  type = lib.types.str;
+                  default = "local";
+                  description = "Gradle profile passed as -Pprofile= for this instance.";
+                };
+
+                javaHome = lib.mkOption {
+                  type = lib.types.path;
+                  default = pkgs.temurin-bin-8;
+                  description = "JAVA_HOME for this instance.";
+                };
+
+                extraEnv = lib.mkOption {
+                  type = lib.types.listOf lib.types.str;
+                  default = [ ];
+                  description = "Additional environment variables (KEY=VALUE) for this instance.";
+                };
+              };
+            }
+          )
+        );
+      default = { };
+      description = "WMS service instances keyed by name (e.g. dev, test).";
+    };
   };
 
   config = lib.mkIf cfg.enable {
@@ -233,6 +446,9 @@ in
         (lib.mapAttrsToList mkBscInstance cfg.bsc.instances)
         ++ (lib.mapAttrsToList mkMdmInstance cfg.mdm.instances)
         ++ (lib.mapAttrsToList mkBmsInstance cfg.bms.instances)
+        ++ (lib.mapAttrsToList mkRmpInstance cfg.rmp.instances)
+        ++ (lib.mapAttrsToList mkOmsInstance cfg.oms.instances)
+        ++ (lib.mapAttrsToList mkWmsInstance cfg.wms.instances)
       );
   };
 }

@@ -111,6 +111,31 @@ in
         profile = "local";
       };
     };
+
+    # 其他后端服务
+    rmp.instances = {
+      main = {
+        enable = true;
+        workingDir = "/srv/yoohoo/rmp-service";
+        profile = "local";
+      };
+    };
+
+    oms.instances = {
+      main = {
+        enable = true;
+        workingDir = "/srv/yoohoo/oms-service";
+        profile = "local";
+      };
+    };
+
+    wms.instances = {
+      main = {
+        enable = true;
+        workingDir = "/srv/yoohoo/wms-service";
+        profile = "local";
+      };
+    };
   };
 
   # 简易 CI/CD：本机多个裸仓库 + 自动部署到各自工作目录
@@ -149,6 +174,36 @@ in
         allowedPushers = [ "empathy" ];
         postCheckoutCmd = ''
           systemctl restart yoohoo-bms-main
+        '';
+      };
+
+      rmp-service = {
+        repoName = "rmp-service.git";
+        workTree = "/srv/yoohoo/rmp-service";
+        branch = "master";
+        allowedPushers = [ "empathy" ];
+        postCheckoutCmd = ''
+          systemctl restart yoohoo-rmp-main
+        '';
+      };
+
+      oms-service = {
+        repoName = "oms-service.git";
+        workTree = "/srv/yoohoo/oms-service";
+        branch = "master";
+        allowedPushers = [ "empathy" ];
+        postCheckoutCmd = ''
+          systemctl restart yoohoo-oms-main
+        '';
+      };
+
+      wms-service = {
+        repoName = "wms-service.git";
+        workTree = "/srv/yoohoo/wms-service";
+        branch = "master";
+        allowedPushers = [ "empathy" ];
+        postCheckoutCmd = ''
+          systemctl restart yoohoo-wms-main
         '';
       };
 
@@ -212,6 +267,52 @@ in
           cp -r /srv/yoohoo/portal-frontend/portal /srv/www/portal
         '';
       };
+
+      # 新增前端仓库：构建后拷贝到 /srv/www 对应目录
+      rmp-frontend = {
+        repoName = "rmp-frontend.git";
+        workTree = "/srv/yoohoo/rmp-frontend";
+        branch = "master";
+        allowedPushers = [ "empathy" ];
+        postCheckoutCmd = ''
+          ${pkgs.pnpm}/bin/pnpm install --frozen-lockfile || ${pkgs.pnpm}/bin/pnpm install
+          ${pkgs.pnpm}/bin/pnpm build:production-no-ts
+
+          mkdir -p /srv/www
+          rm -rf /srv/www/fermp
+          cp -r /srv/yoohoo/rmp-frontend/dist /srv/www/fermp
+        '';
+      };
+
+      oms-frontend = {
+        repoName = "oms-frontend.git";
+        workTree = "/srv/yoohoo/oms-frontend";
+        branch = "master";
+        allowedPushers = [ "empathy" ];
+        postCheckoutCmd = ''
+          ${pkgs.pnpm}/bin/pnpm install --frozen-lockfile || ${pkgs.pnpm}/bin/pnpm install
+          ${pkgs.pnpm}/bin/pnpm build:production-no-ts
+
+          mkdir -p /srv/www
+          rm -rf /srv/www/feoms
+          cp -r /srv/yoohoo/oms-frontend/dist /srv/www/feoms
+        '';
+      };
+
+      wms-frontend = {
+        repoName = "wms-frontend.git";
+        workTree = "/srv/yoohoo/wms-frontend";
+        branch = "master";
+        allowedPushers = [ "empathy" ];
+        postCheckoutCmd = ''
+          ${pkgs.pnpm}/bin/pnpm install --frozen-lockfile || ${pkgs.pnpm}/bin/pnpm install
+          ${pkgs.pnpm}/bin/pnpm build:production-no-ts
+
+          mkdir -p /srv/www
+          rm -rf /srv/www/fewms
+          cp -r /srv/yoohoo/wms-frontend/dist /srv/www/fewms
+        '';
+      };
     };
   };
 
@@ -265,6 +366,28 @@ in
       '';
       locations."/febms/".extraConfig = ''
         try_files $uri $uri/ /febms/index.html;
+      '';
+
+      # 新增前端入口
+      locations."/fermp".extraConfig = ''
+        return 301 /fermp/;
+      '';
+      locations."/fermp/".extraConfig = ''
+        try_files $uri $uri/ /fermp/index.html;
+      '';
+
+      locations."/feoms".extraConfig = ''
+        return 301 /feoms/;
+      '';
+      locations."/feoms/".extraConfig = ''
+        try_files $uri $uri/ /feoms/index.html;
+      '';
+
+      locations."/fewms".extraConfig = ''
+        return 301 /fewms/;
+      '';
+      locations."/fewms/".extraConfig = ''
+        try_files $uri $uri/ /fewms/index.html;
       '';
 
       # 后端 API 代理

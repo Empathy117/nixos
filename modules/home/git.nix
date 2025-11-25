@@ -19,6 +19,12 @@ _: {
           "/srv/git/mdm-frontend.git"
           "/srv/git/bms-frontend.git"
           "/srv/git/portal-frontend.git"
+          "/srv/git/rmp-service.git"
+          "/srv/git/oms-service.git"
+          "/srv/git/wms-service.git"
+          "/srv/git/rmp-frontend.git"
+          "/srv/git/oms-frontend.git"
+          "/srv/git/wms-frontend.git"
         ];
       };
     };
