@@ -32,6 +32,12 @@ in
     wpa_supplicant
   ];
 
+  # 允许运行通用 Linux 动态链接二进制（如 JetBrains Gateway 下载的 remote-dev-server）
+  programs.nix-ld = {
+    enable = true;
+    libraries = with pkgs; [ stdenv.cc.cc ];
+  };
+
   services.mihomo = {
     enable = true;
     configFile = "/etc/mihomo/config.yaml";
