@@ -143,6 +143,22 @@
         "type": "github"
       }
     },
+    "lualineSrc": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1763865090,
+        "narHash": "sha256-OpLZH+sL5cj2rcP5/T+jDOnuxd1QWLHCt2RzloffZOA=",
+        "owner": "nvim-lualine",
+        "repo": "lualine.nvim",
+        "rev": "47f91c416daef12db467145e16bed5bbfe00add8",
+        "type": "github"
+      },
+      "original": {
+        "owner": "nvim-lualine",
+        "repo": "lualine.nvim",
+        "type": "github"
+      }
+    },
     "nixos-vscode-server": {
       "inputs": {
         "flake-utils": "flake-utils",
@@ -315,6 +331,7 @@
     "root": {
       "inputs": {
         "home-manager": "home-manager",
+        "lualineSrc": "lualineSrc",
         "nixos-vscode-server": "nixos-vscode-server",
         "nixos-wsl": "nixos-wsl",
         "nixpkgs": "nixpkgs_2",
