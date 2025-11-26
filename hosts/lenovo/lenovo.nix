@@ -32,10 +32,26 @@ in
     wpa_supplicant
   ];
 
+  fileSystems."/nix" = {
+    device = "/data/nix";
+    fsType = "none";
+    options = [ "bind" ];
+  };
+
   # 允许运行通用 Linux 动态链接二进制（如 JetBrains Gateway 下载的 remote-dev-server）
   programs.nix-ld = {
     enable = true;
     libraries = with pkgs; [ stdenv.cc.cc ];
+  };
+
+  # Journald放在机械盘上
+  services.journald = {
+    storage = "persistent";
+    extraConfig = ''
+      SystemMaxUse=10G
+      RuntimeMaxUse=1G  # 限制在 /var/log/journal 的临时日志大小
+      StateDirectory=/data/log
+    '';
   };
 
   services.mihomo = {
