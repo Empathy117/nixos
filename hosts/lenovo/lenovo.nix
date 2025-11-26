@@ -78,6 +78,9 @@ in
       8896 # bsc-service
       8083 # mdm-service
       8088 # bms-service
+      8881 # oms-service
+      8082 # rmp-service
+      8084 # wms-service
     ];
     # 开启tunmode
     trustedInterfaces = [
@@ -118,7 +121,6 @@ in
       };
     };
 
-    # 其他后端服务
     rmp.instances = {
       main = {
         enable = true;
@@ -401,6 +403,9 @@ in
       locations."/api/".proxyPass = "http://127.0.0.1:8896";
       locations."/mdm/".proxyPass = "http://127.0.0.1:8083";
       locations."/bms/".proxyPass = "http://127.0.0.1:8088";
+      locations."/oms/".proxyPass = "http://127.0.0.1:8881";
+      locations."/rmp/".proxyPass = "http://127.0.0.1:8082";
+      locations."/wms/".proxyPass = "http://127.0.0.1:8084";
     };
   };
 
