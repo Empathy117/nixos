@@ -32,12 +32,6 @@ in
     wpa_supplicant
   ];
 
-  fileSystems."/nix" = {
-    device = "/data/nix";
-    fsType = "none";
-    options = [ "bind" ];
-  };
-
   # 允许运行通用 Linux 动态链接二进制（如 JetBrains Gateway 下载的 remote-dev-server）
   programs.nix-ld = {
     enable = true;
