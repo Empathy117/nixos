@@ -288,7 +288,7 @@ in
 
           mkdir -p /srv/www
           rm -rf /srv/www/fermp
-          cp -r /srv/yoohoo/rmp-frontend/dist /srv/www/fermp
+          cp -r /srv/yoohoo/rmp-frontend/fermp /srv/www/
         '';
       };
 
