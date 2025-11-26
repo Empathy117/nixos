@@ -21,7 +21,7 @@ let
 
           serviceConfig = {
             WorkingDirectory = workingDir;
-            ExecStart = "${pkgs.bash}/bin/bash -lc 'set -e; chmod +x ./gradlew || true; ./gradlew bootRun -Pprofile=${profile}'";
+            ExecStart = "${pkgs.bash}/bin/bash -lc 'set -e; chmod +x ./gradlew || true; ${pkgs.dos2unix}/bin/dos2unix ./gradlew || true; ./gradlew bootRun -Pprofile=${profile}'";
             Restart = "on-failure";
             Environment =
               [
@@ -52,7 +52,7 @@ let
 
           serviceConfig = {
             WorkingDirectory = workingDir;
-            ExecStart = "${pkgs.bash}/bin/bash -lc 'set -e; chmod +x ./gradlew || true; ./gradlew bootRun -Pprofile=${profile}'";
+            ExecStart = "${pkgs.bash}/bin/bash -lc 'set -e; chmod +x ./gradlew || true; ${pkgs.dos2unix}/bin/dos2unix ./gradlew || true; ./gradlew bootRun -Pprofile=${profile}'";
             Restart = "on-failure";
             Environment =
               [
@@ -83,7 +83,7 @@ let
 
           serviceConfig = {
             WorkingDirectory = workingDir;
-            ExecStart = "${pkgs.bash}/bin/bash -lc 'set -e; chmod +x ./gradlew || true; ./gradlew bootRun -Pprofile=${profile}'";
+            ExecStart = "${pkgs.bash}/bin/bash -lc 'set -e; chmod +x ./gradlew || true; ${pkgs.dos2unix}/bin/dos2unix ./gradlew || true; ./gradlew bootRun -Pprofile=${profile}'";
             Restart = "on-failure";
             Environment =
               [
@@ -114,7 +114,7 @@ let
 
           serviceConfig = {
             WorkingDirectory = workingDir;
-            ExecStart = "${pkgs.bash}/bin/bash -lc 'set -e; chmod +x ./gradlew || true; ./gradlew bootRun -Pprofile=${profile}'";
+            ExecStart = "${pkgs.bash}/bin/bash -lc 'set -e; chmod +x ./gradlew || true; ${pkgs.dos2unix}/bin/dos2unix ./gradlew || true; ./gradlew bootRun -Pprofile=${profile}'";
             Restart = "on-failure";
             Environment =
               [
@@ -145,7 +145,7 @@ let
 
           serviceConfig = {
             WorkingDirectory = workingDir;
-            ExecStart = "${pkgs.bash}/bin/bash -lc 'set -e; chmod +x ./gradlew || true; ./gradlew bootRun -Pprofile=${profile}'";
+            ExecStart = "${pkgs.bash}/bin/bash -lc 'set -e; chmod +x ./gradlew || true; ${pkgs.dos2unix}/bin/dos2unix ./gradlew || true; ./gradlew bootRun -Pprofile=${profile}'";
             Restart = "on-failure";
             Environment =
               [
@@ -176,7 +176,7 @@ let
 
           serviceConfig = {
             WorkingDirectory = workingDir;
-            ExecStart = "${pkgs.bash}/bin/bash -lc 'set -e; chmod +x ./gradlew || true; ./gradlew bootRun -Pprofile=${profile}'";
+            ExecStart = "${pkgs.bash}/bin/bash -lc 'set -e; chmod +x ./gradlew || true; ${pkgs.dos2unix}/bin/dos2unix ./gradlew || true; ./gradlew bootRun -Pprofile=${profile}'";
             Restart = "on-failure";
             Environment =
               [
