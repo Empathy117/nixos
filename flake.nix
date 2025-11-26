@@ -27,6 +27,10 @@
       url = "github:nix-community/nixos-vscode-server";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    lualineSrc = {
+      url = "github:nvim-lualine/lualine.nvim";
+      flake = false;
+    };
   };
 
   outputs =
@@ -38,6 +42,7 @@
       nixvim,
       nixos-wsl,
       nixos-vscode-server,
+      lualineSrc,
       ...
     }:
     let
@@ -138,7 +143,7 @@
         lib.nixosSystem {
           inherit system pkgs;
           specialArgs = {
-            inherit pkgsUnstable;
+            inherit pkgsUnstable lualineSrc;
           }
           // (cfg.specialArgs or { });
           modules =
@@ -158,7 +163,7 @@
               home-manager = {
                 useGlobalPkgs = true;
                 useUserPackages = true;
-                extraSpecialArgs = { inherit pkgsUnstable; };
+                extraSpecialArgs = { inherit pkgsUnstable lualineSrc; };
                 users = lib.mapAttrs (_: modules: { imports = modules; }) homeModules;
               };
             }
@@ -173,6 +178,7 @@
         pkgs = pkgsDefault;
         extraSpecialArgs = {
           pkgsUnstable = pkgsUnstableDefault;
+          inherit lualineSrc;
         };
         modules = [
           (_: {
