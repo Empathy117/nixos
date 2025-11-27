@@ -1,6 +1,6 @@
 # home/home.nix
 _: {
-  home.stateVersion = "25.05";
+  home.stateVersion = "25.11";
 
   imports = [
     ../modules/home/cli.nix

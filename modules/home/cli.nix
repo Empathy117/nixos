@@ -14,11 +14,11 @@
       bat
       lf
       ripgrep
+      nixd
+      claude-code
+      codex
     ])
     ++ [
-      pkgsUnstable.codex
-      pkgsUnstable.claude-code
-      pkgsUnstable.nixd
     ];
 
   programs.starship = {
