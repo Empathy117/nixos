@@ -17,6 +17,7 @@
       nixd
       claude-code
       codex
+      git-filter-repo
     ])
     ++ [
     ];
