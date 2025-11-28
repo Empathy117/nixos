@@ -1,4 +1,4 @@
-{ pkgsUnstable, lualineSrc, ... }:
+{ pkgsUnstable, ... }:
 {
   programs.nixvim = {
     enable = true;
