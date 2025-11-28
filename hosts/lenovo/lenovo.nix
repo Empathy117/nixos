@@ -359,6 +359,38 @@ in
         try_files $uri $uri/ /portal/index.html;
       '';
 
+      # qiankun 子应用入口（history 刷新回退到 portal）
+      locations."=/mdm".extraConfig = ''
+        return 301 /mdm/;
+      '';
+      locations."=/mdm/".extraConfig = ''
+        try_files /portal/index.html =404;
+      '';
+      locations."=/bms".extraConfig = ''
+        return 301 /bms/;
+      '';
+      locations."=/bms/".extraConfig = ''
+        try_files /portal/index.html =404;
+      '';
+      locations."=/rmp".extraConfig = ''
+        return 301 /rmp/;
+      '';
+      locations."=/rmp/".extraConfig = ''
+        try_files /portal/index.html =404;
+      '';
+      locations."=/wms".extraConfig = ''
+        return 301 /wms/;
+      '';
+      locations."=/wms/".extraConfig = ''
+        try_files /portal/index.html =404;
+      '';
+      locations."=/oms".extraConfig = ''
+        return 301 /oms/;
+      '';
+      locations."=/oms/".extraConfig = ''
+        try_files /portal/index.html =404;
+      '';
+
       # 门户静态资源
       locations."/assets/".extraConfig = ''
         alias /srv/www/portal/assets/;
