@@ -367,8 +367,8 @@ in
       locations."=/wms".extraConfig = ''return 301 /wms/;'';
       locations."=/oms".extraConfig = ''return 301 /oms/;'';
 
-      # 正则匹配所有子应用路径（包括深层路径如 /bms/pricingrules/xxx）
-      locations."~ ^/(mdm|bms|rmp|wms|oms)/".extraConfig = ''
+      # 新增：/app/ 前缀的前端路由
+      locations."/app/".extraConfig = ''
         try_files $uri /portal/index.html;
       '';
 
