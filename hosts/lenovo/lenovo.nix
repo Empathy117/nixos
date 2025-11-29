@@ -360,35 +360,16 @@ in
       '';
 
       # qiankun 子应用入口（history 刷新回退到 portal）
-      locations."=/mdm".extraConfig = ''
-        return 301 /mdm/;
-      '';
-      locations."/mdm/".extraConfig = ''
-        try_files /portal/index.html =404;
-      '';
-      locations."=/bms".extraConfig = ''
-        return 301 /bms/;
-      '';
-      locations."/bms/".extraConfig = ''
-        try_files /portal/index.html =404;
-      '';
-      locations."=/rmp".extraConfig = ''
-        return 301 /rmp/;
-      '';
-      locations."/rmp/".extraConfig = ''
-        try_files /portal/index.html =404;
-      '';
-      locations."=/wms".extraConfig = ''
-        return 301 /wms/;
-      '';
-      locations."/wms/".extraConfig = ''
-        try_files /portal/index.html =404;
-      '';
-      locations."=/oms".extraConfig = ''
-        return 301 /oms/;
-      '';
-      locations."/oms/".extraConfig = ''
-        try_files /portal/index.html =404;
+      # 精确匹配 /mdm，重定向到 /mdm/
+      locations."=/mdm".extraConfig = ''return 301 /mdm/;'';
+      locations."=/bms".extraConfig = ''return 301 /bms/;'';
+      locations."=/rmp".extraConfig = ''return 301 /rmp/;'';
+      locations."=/wms".extraConfig = ''return 301 /wms/;'';
+      locations."=/oms".extraConfig = ''return 301 /oms/;'';
+
+      # 正则匹配所有子应用路径（包括深层路径如 /bms/pricingrules/xxx）
+      locations."~ ^/(mdm|bms|rmp|wms|oms)/".extraConfig = ''
+        try_files $uri /portal/index.html;
       '';
 
       # 门户静态资源
