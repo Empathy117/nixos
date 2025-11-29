@@ -363,31 +363,31 @@ in
       locations."=/mdm".extraConfig = ''
         return 301 /mdm/;
       '';
-      locations."=/mdm/".extraConfig = ''
+      locations."/mdm/".extraConfig = ''
         try_files /portal/index.html =404;
       '';
       locations."=/bms".extraConfig = ''
         return 301 /bms/;
       '';
-      locations."=/bms/".extraConfig = ''
+      locations."/bms/".extraConfig = ''
         try_files /portal/index.html =404;
       '';
       locations."=/rmp".extraConfig = ''
         return 301 /rmp/;
       '';
-      locations."=/rmp/".extraConfig = ''
+      locations."/rmp/".extraConfig = ''
         try_files /portal/index.html =404;
       '';
       locations."=/wms".extraConfig = ''
         return 301 /wms/;
       '';
-      locations."=/wms/".extraConfig = ''
+      locations."/wms/".extraConfig = ''
         try_files /portal/index.html =404;
       '';
       locations."=/oms".extraConfig = ''
         return 301 /oms/;
       '';
-      locations."=/oms/".extraConfig = ''
+      locations."/oms/".extraConfig = ''
         try_files /portal/index.html =404;
       '';
 
