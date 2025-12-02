@@ -91,6 +91,7 @@ in
       8881 # oms-service
       8082 # rmp-service
       8084 # wms-service
+      3000 # gameport
     ];
     # 开启tunmode
     trustedInterfaces = [
