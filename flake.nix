@@ -4,10 +4,12 @@
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-25.05";
-    nixpkgs-unstable.url = "github:NixOS/nixpkgs/nixos-unstable";
+    # macOS 跟随 unstable 更贴近最新 Darwin 兼容性；用 tarball 避免 GitHub API rate limit
+    nixpkgs-unstable.url = "tarball+https://github.com/NixOS/nixpkgs/archive/refs/heads/nixpkgs-unstable.tar.gz";
     nix-darwin = {
-      url = "github:nix-darwin/nix-darwin/master";
-      inputs.nixpkgs.follows = "nixpkgs";
+      # macOS 使用 nixpkgs-unstable 对应 nix-darwin master；用 tarball 避免 GitHub API rate limit
+      url = "tarball+https://github.com/nix-darwin/nix-darwin/archive/refs/heads/master.tar.gz";
+      inputs.nixpkgs.follows = "nixpkgs-unstable";
     };
     home-manager = {
       url = "github:nix-community/home-manager/release-25.05";
