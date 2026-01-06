@@ -5,6 +5,10 @@
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-25.05";
     nixpkgs-unstable.url = "github:NixOS/nixpkgs/nixos-unstable";
+    nix-darwin = {
+      url = "github:nix-darwin/nix-darwin/master";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
     home-manager = {
       url = "github:nix-community/home-manager/release-25.05";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -21,6 +25,7 @@
   outputs =
     {
       nixpkgs,
+      nix-darwin,
       home-manager,
       nixos-wsl,
       nixos-vscode-server,
@@ -28,20 +33,28 @@
       ...
     }:
     let
-      system = "x86_64-linux";
-      pkgsStable = import nixpkgs {
-        inherit system;
-        config.allowUnfree = true;
-      };
-      pkgsUnstable = import nixpkgs-unstable {
-        inherit system;
-        config.allowUnfree = true;
-      };
       lib = nixpkgs.lib;
       repoSrc = lib.cleanSource ./.;
+      systems = [
+        "x86_64-linux"
+        "aarch64-darwin"
+      ];
+      forAllSystems = f: lib.genAttrs systems (system: f system);
+      mkPkgs =
+        system:
+        import nixpkgs {
+          inherit system;
+          config.allowUnfree = true;
+        };
+      mkPkgsUnstable =
+        system:
+        import nixpkgs-unstable {
+          inherit system;
+          config.allowUnfree = true;
+        };
       mkCheck =
-        name: toolInputs: command:
-        pkgsStable.runCommand name { buildInputs = toolInputs; } ''
+        pkgs: name: toolInputs: command:
+        pkgs.runCommand name { buildInputs = toolInputs; } ''
           ${command}
           touch $out
         '';
@@ -49,26 +62,24 @@
     {
       # WSL: NixOS 集成 Home Manager
       nixosConfigurations.wsl = nixpkgs.lib.nixosSystem {
-        inherit system;
+        system = "x86_64-linux";
 
-        specialArgs = { inherit pkgsUnstable; };
+        specialArgs = {
+          pkgsUnstable = mkPkgsUnstable "x86_64-linux";
+        };
 
         modules = [
           nixos-wsl.nixosModules.default
-          ./hosts/wsl.nix
           nixos-vscode-server.nixosModules.default
           ./common/common.nix
+          ./hosts/wsl.nix
 
           home-manager.nixosModules.home-manager
           {
             home-manager.useGlobalPkgs = true;
             home-manager.useUserPackages = true;
-            home-manager.extraSpecialArgs = { inherit pkgsUnstable; };
-
-            home-manager.users.nixos = {
-              imports = [
-                ./home/home.nix
-              ];
+            home-manager.extraSpecialArgs = {
+              pkgsUnstable = mkPkgsUnstable "x86_64-linux";
             };
           }
         ];
@@ -76,20 +87,54 @@
 
       # 纯 Home Manager 配置
       homeConfigurations."empathy@leny" = home-manager.lib.homeManagerConfiguration {
-        pkgs = pkgsStable;
+        pkgs = mkPkgs "x86_64-linux";
 
-        extraSecialArgs = { inherit pkgsUnstable; };
+        extraSpecialArgs = {
+          pkgsUnstable = mkPkgsUnstable "x86_64-linux";
+        };
 
-        # 直接复用同一个 home.nix
+        # 直接复用同一个 Home profile（不包含系统级配置）
         modules = [
-          ./home/home.nix
-          ./common/common.nix
+          ./home/profiles/gui.nix
+          {
+            home.username = "empathy";
+            home.homeDirectory = "/home/empathy";
+          }
         ];
       };
 
-      checks.${system} = {
-        statix = mkCheck "statix-check" [ pkgsStable.statix ] "statix check ${repoSrc}";
-        deadnix = mkCheck "deadnix-check" [ pkgsStable.deadnix ] "deadnix --fail ${repoSrc}";
+      # macOS: nix-darwin + Home Manager
+      darwinConfigurations."MacBook-Pro" = nix-darwin.lib.darwinSystem {
+        system = "aarch64-darwin";
+
+        specialArgs = {
+          pkgsUnstable = mkPkgsUnstable "aarch64-darwin";
+        };
+
+        modules = [
+          ./common/common.nix
+          ./hosts/macbook-pro.nix
+
+          home-manager.darwinModules.home-manager
+          {
+            home-manager.useGlobalPkgs = true;
+            home-manager.useUserPackages = true;
+            home-manager.extraSpecialArgs = {
+              pkgsUnstable = mkPkgsUnstable "aarch64-darwin";
+            };
+          }
+        ];
       };
+
+      checks = forAllSystems (
+        system:
+        let
+          pkgs = mkPkgs system;
+        in
+        {
+          statix = mkCheck pkgs "statix-check" [ pkgs.statix ] "statix check ${repoSrc}";
+          deadnix = mkCheck pkgs "deadnix-check" [ pkgs.deadnix ] "deadnix --fail ${repoSrc}";
+        }
+      );
     };
 }

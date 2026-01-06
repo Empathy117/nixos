@@ -62,8 +62,7 @@ in
 
   xdg.configFile."nixd/config.json".text = json {
     formatter.command = [
-      "alejandra"
-      "--quiet"
+      "nixfmt"
     ];
   };
 }

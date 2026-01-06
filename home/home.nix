@@ -1,5 +1,6 @@
 # home/home.nix
 {
+  lib,
   pkgs,
   pkgsUnstable,
   ...
@@ -7,24 +8,25 @@
 {
   home.stateVersion = "25.05";
 
-  home.packages = with pkgs; [
-    vim
-    wget
-    python314
-    fastfetch
-    openssl
-    nixd
-    direnv
-    statix
-    deadnix
-    nixfmt-rfc-style
-    pkgsUnstable.codex
-  ];
+  home.packages =
+    (with pkgs; [
+      vim
+      wget
+      (if pkgs ? python314 then pkgs.python314 else pkgs.python3)
+      fastfetch
+      openssl
+      nixd
+      direnv
+      statix
+      deadnix
+      nixfmt-rfc-style
+    ])
+    ++ lib.optional (pkgsUnstable ? codex && lib.meta.availableOn pkgs.stdenv.hostPlatform pkgsUnstable.codex)
+      pkgsUnstable.codex;
 
   imports = [
     ../common/keygen.nix
     ../modules/vscode/base.nix
-    ./vscode
   ];
 
   nixpkgs.config.allowUnfree = true;

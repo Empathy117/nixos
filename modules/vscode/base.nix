@@ -1,4 +1,5 @@
 {
+  config,
   lib,
   pkgs,
   ...
@@ -46,25 +47,54 @@ let
       else
         "${ext.vscodeExtPublisher}.${ext.vscodeExtName}";
   };
+
+  cfg = config.shared.vscode;
+  finalExtensions = cfg.baseExtensions ++ cfg.extraExtensions;
+  finalSettings = lib.foldl' lib.recursiveUpdate cfg.baseUserSettings cfg.extraUserSettings;
 in
 {
   options.shared.vscode = {
-    extensions = lib.mkOption {
+    baseExtensions = lib.mkOption {
       type = lib.types.listOf lib.types.package;
       readOnly = true;
       default = allExtensions;
     };
 
-    remoteMetadata = lib.mkOption {
-      type = lib.types.listOf lib.types.attrs;
+    extraExtensions = lib.mkOption {
+      type = lib.types.listOf lib.types.package;
+      default = [ ];
+    };
+
+    extensions = lib.mkOption {
+      type = lib.types.listOf lib.types.package;
       readOnly = true;
-      default = map metadataFor allExtensions;
+    };
+
+    baseUserSettings = lib.mkOption {
+      type = lib.types.attrs;
+      readOnly = true;
+      default = settings;
+    };
+
+    extraUserSettings = lib.mkOption {
+      type = lib.types.listOf lib.types.attrs;
+      default = [ ];
     };
 
     userSettings = lib.mkOption {
       type = lib.types.attrs;
       readOnly = true;
-      default = settings;
     };
+
+    remoteMetadata = lib.mkOption {
+      type = lib.types.listOf lib.types.attrs;
+      readOnly = true;
+    };
+  };
+
+  config.shared.vscode = {
+    extensions = finalExtensions;
+    userSettings = finalSettings;
+    remoteMetadata = map metadataFor finalExtensions;
   };
 }
