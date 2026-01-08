@@ -247,10 +247,6 @@ in
     screensaver.askForPasswordDelay = 10;
   };
 
-  determinate-nix.customSettings = {
-    "extra-substituters" = "https://mirror.sjtu.edu.cn/nix-channels/store?priority=10";
-  };
-
   system.configurationRevision = self.rev or self.dirtyRev or null;
 
   system.stateVersion = 6;

@@ -48,5 +48,6 @@ in
 
   imports = [
     ../../modules/cli/modern.nix
+    ../../modules/vscode/gui.nix
   ];
 }
