@@ -5,7 +5,7 @@
   ...
 }:
 let
-  settings = import ../../home/vscode/settings.nix;
+  baseSettings = import ./settings.nix;
 
   vscodeExtensions = with pkgs.vscode-extensions; [
     jnoortheen.nix-ide
@@ -73,7 +73,7 @@ in
     baseUserSettings = lib.mkOption {
       type = lib.types.attrs;
       readOnly = true;
-      default = settings;
+      default = baseSettings;
     };
 
     extraUserSettings = lib.mkOption {

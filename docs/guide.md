@@ -6,7 +6,7 @@
 - **分层**：`modules/system` 管系统级共用配置，`home/home.nix` 聚合 CLI/Git/SSH/Direnv，VS Code 通过独立模块实现 GUI 与 Remote Server 双模。
 - **数据驱动**：`flake.nix` 中的 `hostDefs` 决定每台主机加载哪些 System Module + 哪些 Home Module；新增主机只需要“描述”，不用复制粘贴配置。
 - **通道管理**：稳定版 (`nixpkgs`) 与不稳定版 (`nixpkgs-unstable`) 同时引入。默认从稳定渠道取包，只对确实需要新特性的包使用 `pkgsUnstable`。
-- **一次定义，到处复用**：Git、SSH、Direnv 这类“必须保持一致”而且不随硬件变化的内容全部放进 home 模块；VS Code 设置集中在 `home/vscode/settings.nix`，GUI/WSL 共享同一份 JSON。
+- **一次定义，到处复用**：Git、SSH、Direnv 这类“必须保持一致”而且不随硬件变化的内容全部放进 home 模块；VS Code 设置集中在 `modules/vscode/settings.nix`，GUI/Remote 共享同一份 JSON。
 
 ## 2. 目录速览
 | 路径 | 作用 |
@@ -16,7 +16,7 @@
 | `modules/home/*.nix` | 按功能拆分的 Home Manager 片段（CLI 包、Git、SSH、Direnv、自动生成密钥等）|
 | `modules/vscode/base.nix` | 把 VS Code 扩展/设置抽象成 `config.shared.vscode.*`，供 GUI/Remote 共用 |
 | `modules/vscode/gui.nix` | GUI VS Code（本地桌面/非 WSL）的安装与设置 |
-| `home/vscode` | VS Code Server（WSL/远程 Linux）的一次性部署脚本 |
+| `modules/vscode/remote.nix` | VS Code Server（WSL/远程 Linux）的 Home Manager 配置 |
 | `hosts/*.nix` | 每台主机的特有配置（WSL、`devbox` 示范）|
 | `docs/guide.md` | 本指南，记录架构、命令和最佳实践 |
 
@@ -27,7 +27,7 @@ hostDefs = {
     enable = true;
     systemModules = [ nixos-wsl ... ./modules/system/vscode-remote.nix ];
     homeModules = {
-      nixos = [ ./home/home.nix ./home/vscode ];
+      nixos = [ ./home/home.nix ./modules/vscode/remote.nix ];
     };
   };
   devbox = {
@@ -47,7 +47,7 @@ hostDefs = {
 ## 4. Home Manager 角色划分
 - `home/home.nix` 只负责“任何地方都需要”的 CLI 体验：常用包、Git/SSH、Direnv、自动生成 ssh key。
 - VS Code：
-  - **Remote/WSL**：`./home/vscode`（链接 `.vscode-server`、锁定扩展版本、同步 `settings.json`）。
+  - **Remote/WSL**：`modules/vscode/remote.nix`（链接 `.vscode-server`、锁定扩展版本、同步 `settings.json`）。
   - **GUI**：`modules/vscode/gui.nix`（通过 `vscode-with-extensions` 打包 + 设置）。
 - 如果以后需要针对某主机加包，只需在该主机的 `homeModules.<user>` 列表里追加模块即可（例如 `./home/profiles/java.nix`）。
 
@@ -65,7 +65,7 @@ hostDefs = {
 
 ## 7. VS Code 配置复用技巧
 - 所有扩展集中在 `modules/vscode/base.nix`，GUI/Remote 都复用同一个 `settings.nix`。
-- Remote 侧（WSL/服务器）使用 `home/vscode/default.nix` 创建符号链接 + `extensions.json`，防止 VS Code 自动升级导致 hash 失效。
+- Remote 侧（WSL/服务器）使用 `modules/vscode/remote.nix` 创建符号链接 + `extensions.json`，防止 VS Code 自动升级导致 hash 失效。
 - GUI 侧通过 `modules/vscode/gui.nix` 直接封装 `vscode-with-extensions`，保证每次重建后本地也一致。
 
 ## 8. Nix 语法 & 函数式思维速成
@@ -120,7 +120,7 @@ docs/guide.md (lines 81-85) 里提到的“纯 Home Manager：home-manager switc
 继续把 hosts/devbox.nix 当成“最小服务器基线”，只放永远需要的服务（SSH、Docker、VS Code Server 等）。
 另建一个 Wayland/Niri 桌面模块，例如 modules/system/profiles/niri.nix，里面启用 services.wayland.windowManager.niri.enable = true;、programs.sway.enable = false;、PipeWire、seatd、GPU 驱动、桌面应用等。Home Manager 侧也可以加 home/profiles/wayland.nix，放 GUI 专用包（foot/kitty, niri keybindings, portal 设置）。
 在 flake.nix 的 hostDefs 里保留 devbox（纯远程）并新增一个 devbox-desktop 或 devbox-niri 配置：
-devbox = { systemModules = [ ./hosts/devbox.nix ... ]; homeModules.empathy = [ ./home/home.nix ./home/vscode ]; };
+devbox = { systemModules = [ ./hosts/devbox.nix ... ]; homeModules.empathy = [ ./home/home.nix ./modules/vscode/remote.nix ]; };
 devbox-niri = {
   systemModules = hostDefs.devbox.systemModules ++ [ ./modules/system/profiles/niri.nix ];
   homeModules.empathy = hostDefs.devbox.homeModules.empathy ++ [ ./home/profiles/wayland.nix ];

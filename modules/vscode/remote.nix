@@ -46,10 +46,10 @@ let
 in
 {
   imports = [
-    ../../modules/vscode/base.nix
+    ./base.nix
   ];
 
-  # WSL: only manage remote server state; GUI VS Code stays on Windows.
+  # Remote: only manage remote server state; GUI VS Code stays on client.
   home.file = mkMerge [
     extensionLinks
     {

@@ -45,20 +45,21 @@
     let
       inherit (nixpkgs) lib;
       defaultSystem = "x86_64-linux";
+      overlays = [ nur.overlays.default ];
 
       mkPkgs =
         system:
         import nixpkgs {
           inherit system;
           config.allowUnfree = true;
-          overlays = [ nur.overlay ];
+          inherit overlays;
         };
       mkPkgsUnstable =
         system:
         import nixpkgs-unstable {
           inherit system;
           config.allowUnfree = true;
-          overlays = [ nur.overlay ];
+          inherit overlays;
         };
 
       pkgsDefault = mkPkgs defaultSystem;
@@ -71,6 +72,12 @@
           touch $out
         '';
 
+      homeBaseModules = [
+        nixvim.homeModules.default
+        ./home/home.nix
+        ./modules/vscode/remote.nix
+      ];
+
       hostDefs = {
         wsl = {
           enable = true;
@@ -82,11 +89,7 @@
             ./modules/system/vscode-remote.nix
           ];
           homeModules = {
-            nixos = [
-              nixvim.homeManagerModules.default
-              ./home/home.nix
-              ./home/vscode
-            ];
+            nixos = homeBaseModules;
           };
         };
 
@@ -99,11 +102,7 @@
             ./modules/system/vscode-remote.nix
           ];
           homeModules = {
-            empathy = [
-              nixvim.homeManagerModules.default
-              ./home/home.nix
-              ./home/vscode
-            ];
+            empathy = homeBaseModules;
           };
         };
 
@@ -118,11 +117,7 @@
             ./modules/system/git-users.nix
           ];
           homeModules = {
-            empathy = [
-              nixvim.homeManagerModules.default
-              ./home/home.nix
-              ./home/vscode
-            ];
+            empathy = homeBaseModules;
           };
         };
 
@@ -182,7 +177,7 @@
           (_: {
             nixpkgs = {
               config.allowUnfree = true;
-              overlays = [ nur.overlay ];
+              inherit overlays;
             };
           })
           ./hosts/macbook-pro.nix
@@ -198,7 +193,7 @@
           (_: {
             nixpkgs.config.allowUnfree = true;
           })
-          nixvim.homeManagerModules.default
+          nixvim.homeModules.default
           ./home/home.nix
           ./modules/vscode/gui.nix
         ];
