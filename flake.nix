@@ -12,6 +12,17 @@
     nur = {
       url = "github:nix-community/NUR";
     };
+
+    # macOS (nix-darwin)
+    nix-darwin = {
+      url = "tarball+https://github.com/nix-darwin/nix-darwin/archive/refs/heads/master.tar.gz";
+      inputs.nixpkgs.follows = "nixpkgs-unstable";
+    };
+    home-manager-unstable = {
+      url = "tarball+https://github.com/nix-community/home-manager/archive/refs/heads/master.tar.gz";
+      inputs.nixpkgs.follows = "nixpkgs-unstable";
+    };
+
     nixos-wsl = {
       url = "github:nix-community/NixOS-WSL";
     };
@@ -30,16 +41,7 @@
   };
 
   outputs =
-    {
-      nixpkgs,
-      nixpkgs-unstable,
-      nur,
-      home-manager,
-      nixvim,
-      nixos-wsl,
-      nixos-vscode-server,
-      ...
-    }:
+    inputs@{ self, nixpkgs, nixpkgs-unstable, nur, nix-darwin, home-manager, home-manager-unstable, nixvim, nixos-wsl, nixos-vscode-server, ... }:
     let
       inherit (nixpkgs) lib;
       defaultSystem = "x86_64-linux";
@@ -61,7 +63,6 @@
 
       pkgsDefault = mkPkgs defaultSystem;
       pkgsUnstableDefault = mkPkgsUnstable defaultSystem;
-
       repoSrc = lib.cleanSource ./.;
       mkCheck =
         name: toolInputs: command:
@@ -168,6 +169,25 @@
     in
     {
       nixosConfigurations = lib.mapAttrs mkNixosHost activeHosts;
+
+      darwinConfigurations."MacBook-Pro" = nix-darwin.lib.darwinSystem {
+        system = "aarch64-darwin";
+
+        specialArgs = {
+          inherit self;
+        };
+
+        modules = [
+          home-manager-unstable.darwinModules.home-manager
+          (_: {
+            nixpkgs = {
+              config.allowUnfree = true;
+              overlays = [ nur.overlay ];
+            };
+          })
+          ./hosts/macbook-pro.nix
+        ];
+      };
 
       homeConfigurations."empathy@leny" = home-manager.lib.homeManagerConfiguration {
         pkgs = pkgsDefault;
