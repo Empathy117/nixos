@@ -1,4 +1,4 @@
-# hosts/macbook-pro.nix
+# hosts/macbook-pro/default.nix
 {
   pkgs,
   lib,
@@ -216,7 +216,7 @@ in
   home-manager = {
     useGlobalPkgs = true;
     useUserPackages = true;
-    users.empathy = import ../home/profiles/darwin-cli.nix;
+    users.empathy = import ../../home/profiles/darwin-cli.nix;
   };
 
   environment.systemPackages =

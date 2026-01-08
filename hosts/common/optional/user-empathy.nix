@@ -1,7 +1,5 @@
 { pkgs, ... }:
 {
-  networking.hostName = "devbox";
-
   services.openssh = {
     enable = true;
     settings = {
@@ -9,6 +7,8 @@
       KbdInteractiveAuthentication = false;
     };
   };
+
+  users.groups.git = { };
 
   users.users.empathy = {
     isNormalUser = true;
@@ -34,5 +34,4 @@
     docker
     vlock
   ];
-
 }

@@ -1,4 +1,5 @@
 {
+  inputs,
   pkgs,
   config,
   ...
@@ -8,8 +9,17 @@ let
 in
 {
   imports = [
+    ../common/global
+    ../common/optional/docker.nix
+    ../common/optional/yoohoo.nix
+    ../common/optional/vscode-remote.nix
+    ../common/optional/user-empathy.nix
+    ../../modules/system/git-users.nix
     ./hardware-configuration.nix
   ];
+
+  networking.hostName = "lenovo";
+
   hardware.firmware = [
     pkgs.linux-firmware
     aic8800d80-driver

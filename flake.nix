@@ -41,11 +41,16 @@
   };
 
   outputs =
-    inputs@{ self, nixpkgs, nixpkgs-unstable, nur, nix-darwin, home-manager, home-manager-unstable, nixvim, nixos-wsl, nixos-vscode-server, ... }:
+    inputs@{ self, nixpkgs, nixpkgs-unstable, nur, nix-darwin, home-manager, home-manager-unstable, nixvim, ... }:
     let
       inherit (nixpkgs) lib;
       defaultSystem = "x86_64-linux";
       overlays = [ nur.overlays.default ];
+      supportedSystems = [
+        "x86_64-linux"
+        "aarch64-darwin"
+      ];
+      forAllSystems = f: lib.genAttrs supportedSystems (system: f system);
 
       mkPkgs =
         system:
@@ -65,12 +70,6 @@
       pkgsDefault = mkPkgs defaultSystem;
       pkgsUnstableDefault = mkPkgsUnstable defaultSystem;
       repoSrc = lib.cleanSource ./.;
-      mkCheck =
-        name: toolInputs: command:
-        pkgsDefault.runCommand name { buildInputs = toolInputs; } ''
-          ${command}
-          touch $out
-        '';
 
       homeBaseModules = [
         nixvim.homeModules.default
@@ -83,10 +82,7 @@
           enable = true;
           system = "x86_64-linux";
           systemModules = [
-            nixos-wsl.nixosModules.default
-            ./hosts/wsl/wsl.nix
-            nixos-vscode-server.nixosModules.default
-            ./modules/system/vscode-remote.nix
+            ./hosts/wsl
           ];
           homeModules = {
             nixos = homeBaseModules;
@@ -97,9 +93,7 @@
           enable = false;
           system = "x86_64-linux";
           systemModules = [
-            ./hosts/devbox.nix
-            nixos-vscode-server.nixosModules.default
-            ./modules/system/vscode-remote.nix
+            ./hosts/devbox
           ];
           homeModules = {
             empathy = homeBaseModules;
@@ -110,11 +104,7 @@
           enable = true;
           system = "x86_64-linux";
           systemModules = [
-            ./hosts/devbox.nix
-            ./hosts/lenovo/lenovo.nix # 叠加该主机特有配置
-            nixos-vscode-server.nixosModules.default
-            ./modules/system/vscode-remote.nix
-            ./modules/system/git-users.nix
+            ./hosts/lenovo # 叠加该主机特有配置
           ];
           homeModules = {
             empathy = homeBaseModules;
@@ -134,15 +124,12 @@
         lib.nixosSystem {
           inherit system pkgs;
           specialArgs = {
+            inherit inputs;
             inherit pkgsUnstable;
           }
           // (cfg.specialArgs or { });
           modules =
             [
-              ./modules/system/core.nix
-              ./modules/system/docker.nix
-              ./modules/system/yoohoo-services.nix
-              ./modules/system/yoohoo-deploy.nix
               (_: {
                 networking.hostName = lib.mkDefault name;
               })
@@ -180,7 +167,7 @@
               inherit overlays;
             };
           })
-          ./hosts/macbook-pro.nix
+          ./hosts/macbook-pro
         ];
       };
 
@@ -199,9 +186,26 @@
         ];
       };
 
-      checks.${defaultSystem} = {
-        statix = mkCheck "statix-check" [ pkgsDefault.statix ] "statix check ${repoSrc}";
-        deadnix = mkCheck "deadnix-check" [ pkgsDefault.deadnix ] "deadnix --fail ${repoSrc}";
-      };
+      checks = forAllSystems (
+        system:
+        let
+          pkgsCheck =
+            if lib.hasSuffix "darwin" system then
+              mkPkgsUnstable system
+            else
+              mkPkgs system;
+
+          mkCheck =
+            name: toolInputs: command:
+            pkgsCheck.runCommand name { buildInputs = toolInputs; } ''
+              ${command}
+              touch $out
+            '';
+        in
+        {
+          statix = mkCheck "statix-check" [ pkgsCheck.statix ] "statix check ${repoSrc}";
+          deadnix = mkCheck "deadnix-check" [ pkgsCheck.deadnix ] "deadnix --fail ${repoSrc}";
+        }
+      );
     };
 }
