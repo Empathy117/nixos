@@ -23,15 +23,6 @@ let
         sha256 = "sha256-cWXd6AlyxBroZF+cXZzzWZbYPDuOqwCZIK67cEP5sNk=";
       };
     })
-   (pkgs.vscode-utils.buildVscodeMarketplaceExtension {
-      # Fetch from marketplace so we don't have to vendor the VSIX manually.
-     mktplcRef = {
-       publisher = "openai";
-       name = "chatgpt";
-       version = "0.5.39";
-       sha256 = "sha256-cT96SOErVa8BbVGfpgRc4p4FoLSVT74hx08D2JwW/Ks=";
-     };
-   })
   ];
 
   allExtensions = vscodeExtensions ++ marketplaceExtensions;
