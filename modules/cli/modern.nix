@@ -5,6 +5,8 @@
   ...
 }:
 {
+  manual.manpages.enable = false;
+
   programs.fish = {
     enable = true;
 
@@ -136,4 +138,3 @@
     pkgs.ripgrep
   ];
 }
-

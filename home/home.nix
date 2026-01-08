@@ -2,6 +2,8 @@
 _: {
   home.stateVersion = "25.11";
 
+  manual.manpages.enable = false;
+
   imports = [
     ../modules/home/cli.nix
     ../modules/home/git.nix
