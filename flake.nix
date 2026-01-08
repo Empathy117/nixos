@@ -15,11 +15,11 @@
 
     # macOS (nix-darwin)
     nix-darwin = {
-      url = "tarball+https://github.com/nix-darwin/nix-darwin/archive/refs/heads/master.tar.gz";
+      url = "tarball+https://github.com/nix-darwin/nix-darwin/archive/9f48ffaca1f44b3e590976b4da8666a9e86e6eb1.tar.gz";
       inputs.nixpkgs.follows = "nixpkgs-unstable";
     };
     home-manager-unstable = {
-      url = "tarball+https://github.com/nix-community/home-manager/archive/refs/heads/master.tar.gz";
+      url = "tarball+https://github.com/nix-community/home-manager/archive/92394f9deafa80b9de95d7e0f10de78d39ff0564.tar.gz";
       inputs.nixpkgs.follows = "nixpkgs-unstable";
     };
 
