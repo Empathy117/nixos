@@ -1,7 +1,7 @@
 _: {
   programs.git = {
     enable = true;
-    extraConfig = {
+    settings = {
       core.sshCommand = "ssh -4";
       net.defaultAddressFamily = "inet";
       url."ssh://git@github.com/".insteadOf = "https://github.com/";

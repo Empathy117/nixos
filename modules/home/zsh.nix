@@ -1,19 +1,18 @@
-{ ... }:
+{ lib, ... }:
 {
   programs.zsh = {
     enable = true;
     enableCompletion = true;
-    enableAutosuggestions = true;
-    enableSyntaxHighlighting = true;
+
+    autosuggestion.enable = true;
+    syntaxHighlighting.enable = true;
 
     history.size = 10000;
 
-    initExtraFirst = ''
+    initContent = lib.mkBefore ''
       setopt SHARE_HISTORY HIST_IGNORE_DUPS HIST_IGNORE_SPACE EXTENDED_HISTORY
       HISTFILESIZE=10000
-    '';
 
-    initExtra = ''
       setproxy() {
         local host=''${1:-127.0.0.1}
         local port=''${2:-7890}
