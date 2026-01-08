@@ -4,7 +4,8 @@
 
 ## Project Structure & Module Organization
 - `flake.nix` — entrypoint; defines `nixosConfigurations` and `hostDefs` mapping hosts to modules.
-- `hosts/<name>/` — machine‑specific NixOS config (e.g., `hosts/wsl/wsl.nix`, `hosts/lenovo/*`).
+- `hosts/<name>/` — machine‑specific NixOS config (e.g., `hosts/wsl/default.nix`, `hosts/lenovo/default.nix`).
+- `hosts/common/*` — shared host‑composition modules (`global/` + `optional/`).
 - `modules/system/*.nix` — shared system modules (`core.nix`, `docker.nix`, `vscode-remote.nix`).
 - `modules/home/*.nix` — Home Manager modules (`cli.nix`, `git.nix`, `ssh.nix`, `nixvim.nix`, `zsh.nix`).
 - `modules/vscode/*` — VS Code packaging/settings for GUI and remote.
