@@ -3,6 +3,8 @@ let
   ghosttyConfig = ''
     theme = "light:Catppuccin Latte,dark:Catppuccin Mocha"
 
+    term = xterm-256color
+
     font-family = ""
     font-family = "Maple Mono NF CN"
     font-family = "JetBrainsMono Nerd Font Mono"
