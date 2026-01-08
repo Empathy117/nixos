@@ -15,6 +15,10 @@
 
       set -gx EDITOR vim
       set -gx VISUAL vim
+
+      if not set -q fish_color_command
+        fish_config theme choose "ayu Dark"
+      end
     '';
 
     shellAliases = {
