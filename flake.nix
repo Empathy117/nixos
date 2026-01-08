@@ -6,6 +6,7 @@
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-25.05";
     # macOS 跟随 unstable 更贴近最新 Darwin 兼容性；用 tarball 避免 GitHub API rate limit
     nixpkgs-unstable.url = "tarball+https://github.com/NixOS/nixpkgs/archive/refs/heads/nixpkgs-unstable.tar.gz";
+    determinate.url = "https://flakehub.com/f/DeterminateSystems/determinate/3";
     nix-darwin = {
       # macOS 使用 nixpkgs-unstable 对应 nix-darwin master；用 tarball 避免 GitHub API rate limit
       url = "tarball+https://github.com/nix-darwin/nix-darwin/archive/refs/heads/master.tar.gz";
@@ -14,6 +15,11 @@
     home-manager = {
       url = "github:nix-community/home-manager/release-25.05";
       inputs.nixpkgs.follows = "nixpkgs";
+    };
+    home-manager-unstable = {
+      # macOS 跟随 nixpkgs-unstable，避免 HM 与 nixpkgs 接口不匹配
+      url = "github:nix-community/home-manager/master";
+      inputs.nixpkgs.follows = "nixpkgs-unstable";
     };
     nixos-vscode-server = {
       url = "github:nix-community/nixos-vscode-server";
@@ -25,10 +31,13 @@
   };
 
   outputs =
-    {
+    inputs@{
+      self,
       nixpkgs,
       nix-darwin,
+      determinate,
       home-manager,
+      home-manager-unstable,
       nixos-wsl,
       nixos-vscode-server,
       nixpkgs-unstable,
@@ -105,26 +114,18 @@
         ];
       };
 
-      # macOS: nix-darwin + Home Manager
+      # macOS: nix-darwin (Determinate base)
       darwinConfigurations."MacBook-Pro" = nix-darwin.lib.darwinSystem {
         system = "aarch64-darwin";
 
         specialArgs = {
-          pkgsUnstable = mkPkgsUnstable "aarch64-darwin";
+          inherit self;
         };
 
         modules = [
-          ./common/common.nix
+          determinate.darwinModules.default
+          home-manager-unstable.darwinModules.home-manager
           ./hosts/macbook-pro.nix
-
-          home-manager.darwinModules.home-manager
-          {
-            home-manager.useGlobalPkgs = true;
-            home-manager.useUserPackages = true;
-            home-manager.extraSpecialArgs = {
-              pkgsUnstable = mkPkgsUnstable "aarch64-darwin";
-            };
-          }
         ];
       };
 

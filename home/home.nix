@@ -35,7 +35,7 @@
     enable = true;
 
     extraConfig = {
-      user.name = "empathy";
+      user.name = "Empathy117";
       user.email = "empathyyiyiqi@gmail.com";
 
       net.defaultAddressFamily = "inet";
