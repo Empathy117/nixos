@@ -1,4 +1,4 @@
-{ ... }:
+{ config, ... }:
 let
   ghosttyConfig = ''
     theme = "light:Catppuccin Latte,dark:Catppuccin Mocha"
@@ -23,6 +23,7 @@ let
     background-blur = 30
 
     cursor-style = bar
+    adjust-cursor-thickness = 2
     cursor-style-blink = false
     cursor-opacity = 0.85
 
@@ -40,6 +41,10 @@ in
   home.homeDirectory = "/Users/empathy";
   home.stateVersion = "25.05";
   home.enableNixpkgsReleaseCheck = false;
+
+  home.sessionPath = [
+    "/etc/profiles/per-user/${config.home.username}/bin"
+  ];
 
   # Ghostty on macOS may prefer the App Support config path.
   xdg.configFile."ghostty/config".text = ghosttyConfig;
