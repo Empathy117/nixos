@@ -71,5 +71,6 @@ in
   imports = [
     ../../modules/cli/modern.nix
     ../../modules/vscode/gui.nix
+    ../../modules/home/nixvim.nix
   ];
 }
