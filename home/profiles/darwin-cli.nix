@@ -50,9 +50,16 @@ in
     "/etc/profiles/per-user/${config.home.username}/bin"
   ];
 
-  home.packages = [
-    pkgs.codex
-  ];
+  home.packages = 
+    (with pkgs; [
+      codex
+      claude-code
+      nixd
+      nixfmt
+      statix
+    ])
+    ++ [
+    ];
 
   # Ghostty on macOS may prefer the App Support config path.
   xdg.configFile."ghostty/config".text = ghosttyConfig;
