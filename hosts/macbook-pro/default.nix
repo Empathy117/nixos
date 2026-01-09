@@ -1,5 +1,6 @@
 # hosts/macbook-pro/default.nix
 {
+  config,
   pkgs,
   lib,
   self,
@@ -36,6 +37,9 @@ in
       pkgs.vim
     ]
     ++ lib.optional (pkgs ? codex) pkgs.codex
+    ++ lib.optional
+      (config.home-manager.users.empathy.programs.vscode.enable or false)
+      config.home-manager.users.empathy.programs.vscode.package
     ++ apps.all;
 
   # Determinate Systems 已经管理 Nix 安装与 daemon；这里避免 nix-darwin 介入。
