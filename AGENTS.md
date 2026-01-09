@@ -1,41 +1,54 @@
 # Repository Guidelines
 
->This repository is a Nix flake for multi‑host NixOS and Home Manager configuration.
+>This repository is a multi-host Nix flake for NixOS + macOS (nix-darwin) + Home Manager.
 
-## Project Structure & Module Organization
-- `flake.nix` — entrypoint; defines `nixosConfigurations` and `hostDefs` mapping hosts to modules.
-- `hosts/<name>/` — machine‑specific NixOS config (e.g., `hosts/wsl/default.nix`, `hosts/lenovo/default.nix`).
-- `hosts/common/*` — shared host‑composition modules (`global/` + `optional/`).
-- `modules/system/*.nix` — shared system modules (`core.nix`, `docker.nix`, `vscode-remote.nix`).
-- `modules/home/*.nix` — Home Manager modules (`cli.nix`, `git.nix`, `ssh.nix`, `nixvim.nix`, `zsh.nix`).
-- `modules/vscode/*` — VS Code packaging/settings for GUI and remote.
-- `home/home.nix` — user profile aggregator; imports the Home modules.
-- `scripts/` — helper scripts (e.g., `scripts/auth.sh`).
+## Layout (Where Things Live)
+- `flake.nix` — entrypoint; defines `nixosConfigurations`, `darwinConfigurations`, and shared inputs.
+- `hosts/<name>/` — host composition layer.
+  - Linux/NixOS hosts: `hosts/wsl`, `hosts/lenovo`, `hosts/devbox`.
+  - macOS host: `hosts/macbook-pro` (+ `hosts/macbook-pro/apps` for GUI apps).
+- `hosts/common/*` — shared NixOS host modules (`global/` + `optional/`).
+- `home/home.nix` — Linux-ish Home Manager aggregator for `homeConfigurations` and NixOS HM.
+- `home/profiles/darwin-cli.nix` — macOS Home Manager profile (shell/tools/user dotfiles).
+- `modules/system/*.nix` — shared NixOS system modules.
+- `modules/home/*.nix` — shared Home Manager modules (mostly for Linux/NixOS targets).
+- `modules/cli/modern.nix` — cross-shell modern CLI defaults (fish/starship/fzf/etc).
+- `modules/vscode/*` — VS Code shared settings/extensions + GUI/remote split.
+- `modules/darwin/app-builders.nix` — macOS app packagers (ZIP/DMG → `.app` + optional CLI links).
+- `scripts/` — helper scripts (keep secrets out of git).
 - `docs/` — architecture/usage notes.
 
-## Build, Test, and Development Commands
-- Run static checks: `nix flake check` (executes `statix` + `deadnix`).
-- Build a system: `nix build .#nixosConfigurations.<host>.config.system.build.toplevel`.
-- Apply to a host: `sudo nixos-rebuild test --flake .#<host>` then `sudo nixos-rebuild switch --flake .#<host>`.
-- Apply Home config (standalone): `home-manager switch --flake .#empathy@leny`.
+## Best Practice: System vs Home (CLI vs GUI)
+- Prefer **Home Manager** for user-scoped CLI tools and dotfiles (portable, easy to reuse).
+- Prefer **nix-darwin systemPackages** for GUI `.app` you want in `/Applications/Nix Apps` / Launchpad.
+- macOS GUI apps:
+  - Nixpkgs-provided apps: add to `hosts/macbook-pro/apps/default.nix` under `nixpkgsApps`.
+  - Custom ZIP/DMG apps: wrap with `mkZipApp`/`mkDmgApp` and add under `customApps`.
+- VS Code:
+  - Settings/extensions live in `modules/vscode/base.nix` + `modules/vscode/settings.nix`.
+  - GUI config uses `modules/vscode/gui.nix`; Remote server uses `modules/vscode/remote.nix`.
 
-## Coding Style & Naming Conventions
-- Nix formatting: use `nixfmt` (RFC style). Example: `nixfmt -w .`.
-- Lint: `statix check .`; find unused: `deadnix --fail .`.
-- Use two‑space indentation; one option per line; prefer lower‑kebab‑case filenames (e.g., `vscode-remote.nix`).
-- Keep modules small and focused; avoid inlining secrets or host‑specific logic in shared modules.
+## Build / Apply / Checks
+- Fast eval (no builds): `nix flake check --no-build`
+- Full static checks: `nix flake check` (runs `statix` + `deadnix`)
+- NixOS apply: `sudo nixos-rebuild test --flake .#<host>` then `sudo nixos-rebuild switch --flake .#<host>`
+- macOS apply: `sudo darwin-rebuild switch --flake .#MacBook-Pro`
+- Build only:
+  - NixOS: `nix build .#nixosConfigurations.<host>.config.system.build.toplevel`
+  - macOS: `nix build .#darwinConfigurations.MacBook-Pro.system`
+- Suppress dirty-tree warnings during iteration: add `--no-warn-dirty` to `nix`/`*-rebuild` commands.
 
-## Testing Guidelines
-- Always run `nix flake check` before pushing.
-- For system changes, validate with `nixos-rebuild test` on the targeted host before `switch`.
-- No unit tests here; rely on flake checks and manual host verification.
+## Debugging Workflow (Keep It Fast)
+- Start with the smallest failing target (`nix flake check --no-build` or a single host build).
+- Use `--show-trace` for eval errors; use `nix log <drv>` for build logs.
+- Use `rg` for searching; avoid broad refactors without a failing reproduction.
+- Change one thing at a time, re-evaluate, then commit.
 
-## Commit & Pull Request Guidelines
-- Follow Conventional Commits: `feat:`, `fix:`, `refactor:`, `build:` (see git history).
-- PRs must include: summary, affected hosts, verification commands/output, and links to issues.
-- If changing shared modules (under `modules/system` or `modules/home`), call out cross‑host impact.
+## Style, Validation, Commits
+- Formatting: `nixfmt -w .` (keep 2-space indentation and one option per line).
+- Lint: `statix check .`; unused: `deadnix --fail .`.
+- Commits: small + atomic + Conventional Commits (`feat:`, `fix:`, `refactor:`...). Run `nix flake check --no-build` before committing and `nix flake check` before pushing.
 
-## Security & Configuration Tips
-- Do not commit credentials. `scripts/auth.sh` takes credentials via args/env; keep private.
-- Proxy helpers are in Zsh (`setproxy`, `unsetproxy`); avoid hard‑coding proxies in modules.
-- Keep default substituters; only modify mirrors with justification.
+## Security Notes
+- Do not commit credentials or tokens; keep private material out of Nix store when possible.
+- If proxy settings are needed, prefer per-host modules under `hosts/<name>/` instead of hard-coding globally.
