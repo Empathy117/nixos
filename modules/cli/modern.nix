@@ -16,6 +16,29 @@
       set -gx EDITOR vim
       set -gx VISUAL vim
 
+      function setproxy
+        set -l host 127.0.0.1
+        set -l port 7897
+        if test (count $argv) -ge 1
+          set host $argv[1]
+        end
+        if test (count $argv) -ge 2
+          set port $argv[2]
+        end
+        set -gx http_proxy "http://$host:$port"
+        set -gx https_proxy "http://$host:$port"
+        set -gx all_proxy "socks5://$host:$port"
+        set -gx HTTP_PROXY $http_proxy
+        set -gx HTTPS_PROXY $https_proxy
+        set -gx ALL_PROXY $all_proxy
+        echo "Proxy set to $host:$port"
+      end
+
+      function unsetproxy
+        set -e http_proxy https_proxy all_proxy HTTP_PROXY HTTPS_PROXY ALL_PROXY
+        echo "Proxy variables cleared"
+      end
+
       if not set -q fish_color_command
         if type -q defaults
           if test (defaults read -g AppleInterfaceStyle 2>/dev/null) = "Dark"
