@@ -18,12 +18,12 @@ let
 
     window-colorspace = display-p3
 
-    background-opacity = 0.9
+    background-opacity = 0.8
     background-opacity-cells = true
-    background-blur = 30
+    background-blur = 8
 
     cursor-style = bar
-    adjust-cursor-thickness = 2
+    adjust-cursor-thickness = 3
     cursor-style-blink = false
     cursor-opacity = 0.85
 
