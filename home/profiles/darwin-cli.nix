@@ -57,6 +57,7 @@ in
       nixd
       nixfmt
       statix
+      rsync
     ])
     ++ [
     ];
