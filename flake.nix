@@ -4,10 +4,12 @@
 
   inputs = {
     nixpkgs = {
-      url = "github:NixOS/nixpkgs/nixos-25.11";
+      # Use a branch tarball to avoid GitHub API rate limits.
+      url = "tarball+https://github.com/NixOS/nixpkgs/archive/refs/heads/nixos-25.11.tar.gz";
     };
     nixpkgs-unstable = {
-      url = "github:NixOS/nixpkgs/nixos-unstable";
+      # Use a branch tarball to avoid GitHub API rate limits.
+      url = "tarball+https://github.com/NixOS/nixpkgs/archive/refs/heads/nixos-unstable.tar.gz";
     };
     nur = {
       url = "github:nix-community/NUR";
@@ -15,11 +17,13 @@
 
     # macOS (nix-darwin)
     nix-darwin = {
-      url = "tarball+https://github.com/nix-darwin/nix-darwin/archive/9f48ffaca1f44b3e590976b4da8666a9e86e6eb1.tar.gz";
+      # Use a branch tarball to avoid GitHub API rate limits.
+      url = "tarball+https://github.com/nix-darwin/nix-darwin/archive/refs/heads/master.tar.gz";
       inputs.nixpkgs.follows = "nixpkgs-unstable";
     };
     home-manager-unstable = {
-      url = "tarball+https://github.com/nix-community/home-manager/archive/92394f9deafa80b9de95d7e0f10de78d39ff0564.tar.gz";
+      # Use a branch tarball to avoid GitHub API rate limits.
+      url = "tarball+https://github.com/nix-community/home-manager/archive/refs/heads/master.tar.gz";
       inputs.nixpkgs.follows = "nixpkgs-unstable";
     };
 
