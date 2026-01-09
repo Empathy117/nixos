@@ -1,4 +1,4 @@
-{ config, ... }:
+{ config, pkgs, ... }:
 let
   ghosttyConfig = ''
     theme = "light:Catppuccin Latte,dark:Catppuccin Mocha"
@@ -44,6 +44,10 @@ in
 
   home.sessionPath = [
     "/etc/profiles/per-user/${config.home.username}/bin"
+  ];
+
+  home.packages = [
+    pkgs.codex
   ];
 
   # Ghostty on macOS may prefer the App Support config path.

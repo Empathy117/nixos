@@ -2,7 +2,6 @@
   config,
   lib,
   options,
-  pkgs,
   ...
 }:
 
@@ -22,25 +21,21 @@ in
 
   config = lib.mkMerge [
     {
-      programs.vscode = {
-        enable = true;
-        package =
-          (pkgs.vscode-with-extensions.override {
-            vscodeExtensions = sharedExtensions;
-          }).overrideAttrs
-            (_: {
-              pname = "vscode";
-              inherit (pkgs.vscode) version;
-            });
-      };
+      programs.vscode.enable = true;
     }
 
     (lib.mkIf hasVscodeProfiles {
-      programs.vscode.profiles.default.userSettings = sharedSettings;
+      programs.vscode.profiles.default = {
+        userSettings = sharedSettings;
+        extensions = sharedExtensions;
+      };
     })
 
     (lib.mkIf (!hasVscodeProfiles) {
-      programs.vscode.userSettings = sharedSettings;
+      programs.vscode = {
+        userSettings = sharedSettings;
+        extensions = sharedExtensions;
+      };
     })
   ];
 }
