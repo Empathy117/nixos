@@ -17,7 +17,15 @@
       set -gx VISUAL vim
 
       if not set -q fish_color_command
-        fish_config theme choose "ayu Dark"
+        if type -q defaults
+          if test (defaults read -g AppleInterfaceStyle 2>/dev/null) = "Dark"
+            fish_config theme choose "ayu-mirage"
+          else
+            fish_config theme choose "snow-day"
+          end
+        else
+          fish_config theme choose "ayu-mirage"
+        end
       end
     '';
 
