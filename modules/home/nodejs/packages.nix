@@ -4,7 +4,7 @@
   programs.nodejs = {
     # 按需下载（用 pnpx，首次慢，之后快）
     globalPackages = [
-      "cxresume"
+      # "cxresume"
     ];
     
     # 真正安装（占空间，但最快）
