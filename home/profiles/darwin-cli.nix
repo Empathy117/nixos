@@ -42,6 +42,10 @@ in
   home.stateVersion = "25.05";
   home.enableNixpkgsReleaseCheck = false;
 
+  # Apps are already managed via nix-darwin in /Applications (Launchpad-ready).
+  # Disable Home Manager's ~/Applications/Home Manager Apps links.
+  targets.darwin.linkApps.enable = false;
+
   home.sessionPath = [
     "/etc/profiles/per-user/${config.home.username}/bin"
   ];
