@@ -13,6 +13,99 @@ let
     inherit pkgs lib;
     inherit (appBuilders) mkZipApp mkDmgApp;
   };
+  mkTccApp =
+    {
+      pname,
+      version,
+      appName,
+      displayName,
+      bundleId,
+      binName,
+      binPath,
+    }:
+    pkgs.stdenvNoCC.mkDerivation {
+      inherit pname version;
+
+      dontUnpack = true;
+
+      installPhase = ''
+        app="$out/Applications/${appName}"
+        mkdir -p "$app/Contents/MacOS" "$app/Contents/Resources" "$out/bin"
+
+        cp ${binPath} "$app/Contents/MacOS/${binName}"
+        chmod +x "$app/Contents/MacOS/${binName}"
+
+        cat > "$app/Contents/Info.plist" <<EOF
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+  <dict>
+    <key>CFBundleDisplayName</key>
+    <string>${displayName}</string>
+    <key>CFBundleName</key>
+    <string>${displayName}</string>
+    <key>CFBundleIdentifier</key>
+    <string>${bundleId}</string>
+    <key>CFBundleExecutable</key>
+    <string>${binName}</string>
+    <key>CFBundlePackageType</key>
+    <string>APPL</string>
+    <key>CFBundleShortVersionString</key>
+    <string>${version}</string>
+    <key>CFBundleVersion</key>
+    <string>${version}</string>
+    <key>LSUIElement</key>
+    <true/>
+  </dict>
+</plist>
+EOF
+        echo "APPL????" > "$app/Contents/PkgInfo"
+
+        cat > "$out/bin/${binName}" <<EOF
+#!/bin/sh
+exec "$app/Contents/MacOS/${binName}" "\$@"
+EOF
+        chmod +x "$out/bin/${binName}"
+      '';
+
+      dontFixup = true;
+      meta.platforms = lib.platforms.darwin;
+    };
+  skhdApp = mkTccApp {
+    pname = "skhd-app";
+    version = pkgs.skhd.version;
+    appName = "Skhd.app";
+    displayName = "Skhd";
+    bundleId = "com.empathy.skhd";
+    binName = "skhd";
+    binPath = "${pkgs.skhd}/bin/skhd";
+  };
+  yabaiApp = mkTccApp {
+    pname = "yabai-app";
+    version = pkgs.yabai.version;
+    appName = "Yabai.app";
+    displayName = "Yabai";
+    bundleId = "com.empathy.yabai";
+    binName = "yabai";
+    binPath = "${pkgs.yabai}/bin/yabai";
+  };
+  sketchybarBundle = pkgs.stdenvNoCC.mkDerivation {
+    pname = "sketchybar-config";
+    version = "official";
+    src = ./sketchybar;
+    dontUnpack = true;
+    installPhase = ''
+      mkdir -p "$out/plugins"
+      install -m 0644 "$src/sketchybarrc" "$out/sketchybarrc"
+      install -m 0755 "$src/plugins/"*.sh "$out/plugins/"
+    '';
+    dontFixup = true;
+  };
+  sketchybarConfig = ''
+    #!/usr/bin/env bash
+    CONFIG_DIR="${sketchybarBundle}"
+    . "${sketchybarBundle}/sketchybarrc"
+  '';
 in
 {
   nixpkgs.config.allowUnfree = true;
@@ -25,6 +118,7 @@ in
   fonts.packages = [
     pkgs."nerd-fonts"."jetbrains-mono"
     pkgs."maple-mono"."NF-CN"
+    pkgs."nerd-fonts"."hack"
   ];
 
   home-manager = {
@@ -41,6 +135,9 @@ in
   environment.systemPackages =
     [
       pkgs.vim
+      skhdApp
+      yabaiApp
+      pkgs.sketchybar
     ]
     ++ apps.all;
 
@@ -68,9 +165,38 @@ in
     ];
   };
 
+  services.skhd = {
+    enable = true;
+    package = skhdApp;
+    skhdConfig = ''
+      cmd - space : open -b com.apple.apps.launcher
+    '';
+  };
+
+  services.yabai = {
+    enable = true;
+    package = yabaiApp;
+  };
+  services.sketchybar = {
+    enable = true;
+    config = sketchybarConfig;
+    extraPackages = [
+      yabaiApp
+    ];
+  };
+  services.jankyborders = {
+    enable = true;
+    active_color = "0x88b7e8ff";
+    inactive_color = "0x339dbfe6";
+    width = 3.0;
+    style = "round";
+    blur_radius = 4.0;
+    hidpi = true;
+  };
+
   system.defaults = {
     dock.autohide = true;
-    dock.mru-spaces = false;
+    dock.mru-spaces = true;
 
     finder.AppleShowAllExtensions = true;
     finder.FXPreferredViewStyle = "clmv";
@@ -317,17 +443,7 @@ in
             };
           };
 
-          "160" = {
-            enabled = 1;
-            value = {
-              parameters = [
-                32
-                49
-                1048576
-              ];
-              type = "standard";
-            };
-          };
+          "160".enabled = 0;
           "164" = {
             enabled = 0;
             value = {
