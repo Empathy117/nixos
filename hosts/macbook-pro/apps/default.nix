@@ -51,6 +51,20 @@ let
     appName = "Infuse.app";
   };
 
+  emacsJimeh = mkDmgApp {
+    pname = "emacs-jimeh";
+    version = "30.2-1";
+    url = "https://github.com/jimeh/emacs-builds/releases/download/Emacs-30.2-1/Emacs.2025-08-14.636f166.emacs-30-2-1.macOS-11.arm64.dmg";
+    hash = "sha256-gncCHtPrcWMzEgY4/8JWXBuJPpFG4Gc4uzUhYw856xk=";
+    appName = "Emacs.app";
+    binLinks = [
+      {
+        name = "emacs";
+        path = "Contents/MacOS/Emacs";
+      }
+    ];
+  };
+
   optionalOn = pkg: lib.optional (lib.meta.availableOn pkgs.stdenv.hostPlatform pkg) pkg;
 
   nixpkgsApps = lib.concatMap optionalOn [
@@ -61,6 +75,7 @@ let
     pkgs.raycast
     pkgs.iina
     pkgs.chatgpt
+    pkgs.spotify
   ];
 
   customApps = [
@@ -69,6 +84,7 @@ let
     clashVergeRev
     baiduNetdisk
     infuse
+    emacsJimeh
   ];
 in
 {
