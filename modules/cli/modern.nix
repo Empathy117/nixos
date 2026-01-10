@@ -161,6 +161,38 @@
     enable = true;
     enableFishIntegration = true;
     shellWrapperName = "y";
+    settings = {
+      manager = {
+        ratio = [
+          1
+          4
+          3
+        ];
+        sort_by = "modified";
+        sort_reverse = true;
+        sort_dir_first = true;
+        show_hidden = false;
+        show_symlink = true;
+        linemode = "git";
+        scrolloff = 2;
+      };
+      preview = {
+        max_width = 1200;
+        max_height = 900;
+      };
+    };
+    plugins = {
+      git = pkgs.yaziPlugins.git;
+      "full-border" = pkgs.yaziPlugins."full-border";
+      yatline = pkgs.yaziPlugins.yatline;
+      "yatline-catppuccin" = pkgs.yaziPlugins."yatline-catppuccin";
+    };
+    initLua = ''
+      require("full-border"):setup()
+      require("git"):setup()
+      require("yatline"):setup()
+      require("yatline-catppuccin"):setup()
+    '';
   };
 
   programs.direnv = {
