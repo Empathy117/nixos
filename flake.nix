@@ -21,9 +21,9 @@
       url = "tarball+https://github.com/nix-darwin/nix-darwin/archive/refs/heads/master.tar.gz";
       inputs.nixpkgs.follows = "nixpkgs-unstable";
     };
-    home-manager-unstable = {
+    home-manager-release = {
       # Use a branch tarball to avoid GitHub API rate limits.
-      url = "tarball+https://github.com/nix-community/home-manager/archive/refs/heads/master.tar.gz";
+      url = "tarball+https://github.com/nix-community/home-manager/archive/refs/heads/release-25.11.tar.gz";
       inputs.nixpkgs.follows = "nixpkgs-unstable";
     };
 
@@ -45,7 +45,7 @@
   };
 
   outputs =
-    inputs@{ self, nixpkgs, nixpkgs-unstable, nur, nix-darwin, home-manager, home-manager-unstable, nixvim, ... }:
+    inputs@{ self, nixpkgs, nixpkgs-unstable, nur, nix-darwin, home-manager, home-manager-release, nixvim, ... }:
     let
       inherit (nixpkgs) lib;
       defaultSystem = "x86_64-linux";
@@ -173,7 +173,7 @@
         };
 
         modules = [
-          home-manager-unstable.darwinModules.home-manager
+          home-manager-release.darwinModules.home-manager
           (_: {
             nixpkgs = {
               config.allowUnfree = true;

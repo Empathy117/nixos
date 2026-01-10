@@ -97,21 +97,21 @@
         "type": "github"
       }
     },
-    "home-manager-unstable": {
+    "home-manager-release": {
       "inputs": {
         "nixpkgs": [
           "nixpkgs-unstable"
         ]
       },
       "locked": {
-        "lastModified": 1767971841,
-        "narHash": "sha256-TwDXF4MkmjI9c3Sly9FOWXf4sPbre6ZujG87v39G1Ig=",
+        "lastModified": 1767910483,
+        "narHash": "sha256-MOU5YdVu4DVwuT5ztXgQpPuRRBjSjUGIdUzOQr9iQOY=",
         "type": "tarball",
-        "url": "https://github.com/nix-community/home-manager/archive/refs/heads/master.tar.gz"
+        "url": "https://github.com/nix-community/home-manager/archive/refs/heads/release-25.11.tar.gz"
       },
       "original": {
         "type": "tarball",
-        "url": "https://github.com/nix-community/home-manager/archive/refs/heads/master.tar.gz"
+        "url": "https://github.com/nix-community/home-manager/archive/refs/heads/release-25.11.tar.gz"
       }
     },
     "nix-darwin": {
@@ -271,7 +271,7 @@
     "root": {
       "inputs": {
         "home-manager": "home-manager",
-        "home-manager-unstable": "home-manager-unstable",
+        "home-manager-release": "home-manager-release",
         "nix-darwin": "nix-darwin",
         "nixos-vscode-server": "nixos-vscode-server",
         "nixos-wsl": "nixos-wsl",
