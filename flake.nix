@@ -49,7 +49,16 @@
     let
       inherit (nixpkgs) lib;
       defaultSystem = "x86_64-linux";
-      overlays = [ nur.overlays.default ];
+      overlays = [
+        nur.overlays.default
+        (final: prev: {
+          claude-code = prev.claude-code.overrideAttrs (_old: {
+            NIX_NPM_REGISTRY_OVERRIDES = builtins.toJSON {
+              "https://registry.npmjs.org/" = "https://registry.npmmirror.com/";
+            };
+          });
+        })
+      ];
       supportedSystems = [
         "x86_64-linux"
         "aarch64-darwin"
@@ -160,7 +169,7 @@
         system = "aarch64-darwin";
 
         specialArgs = {
-          inherit self;
+          inherit self inputs;
         };
 
         modules = [
