@@ -4,6 +4,9 @@ in
 {
   "editor.formatOnSave" = false;
   "git.autofetch" = true;
+  "[python]" = {
+    "editor.defaultFormatter" = "charliermarsh.ruff";
+  };
   "nix.enableLanguageServer" = true;
   "nix.serverPath" = "nixd";
   # LSP config can be passed via ``nix.serverSettings.{lsp}`` as shown below.

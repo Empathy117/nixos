@@ -12,6 +12,14 @@ let
     mkhl.direnv
     arrterian.nix-env-selector
     bbenoist.nix
+    ms-python.python
+    ms-python.vscode-pylance
+    charliermarsh.ruff
+    ms-azuretools.vscode-docker
+    redhat.vscode-yaml
+    ms-vscode-remote.remote-containers
+    alexkrechik.cucumberautocomplete
+    humao.rest-client
   ];
 
   marketplaceExtensions = [
