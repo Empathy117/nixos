@@ -14,6 +14,9 @@
     nur = {
       url = "github:nix-community/NUR";
     };
+    opencode = {
+      url = "github:anomalyco/opencode";
+    };
 
     # macOS (nix-darwin)
     nix-darwin = {
@@ -45,7 +48,17 @@
   };
 
   outputs =
-    inputs@{ self, nixpkgs, nixpkgs-unstable, nur, nix-darwin, home-manager, home-manager-release, nixvim, ... }:
+    inputs@{
+      self,
+      nixpkgs,
+      nixpkgs-unstable,
+      nur,
+      nix-darwin,
+      home-manager,
+      home-manager-release,
+      nixvim,
+      ...
+    }:
     let
       inherit (nixpkgs) lib;
       defaultSystem = "x86_64-linux";
@@ -135,18 +148,17 @@
           homeModules = cfg.homeModules or { };
         in
         lib.nixosSystem {
-          inherit system pkgs;
+          inherit pkgs;
           specialArgs = {
             inherit inputs;
             inherit pkgsUnstable;
           }
           // (cfg.specialArgs or { });
-          modules =
-            [
-              (_: {
-                networking.hostName = lib.mkDefault name;
-              })
-            ]
+          modules = [
+            (_: {
+              networking.hostName = lib.mkDefault name;
+            })
+          ]
           ++ (cfg.systemModules or [ ])
           ++ lib.optionals (homeModules != { }) [
             home-manager.nixosModules.home-manager
@@ -154,7 +166,10 @@
               home-manager = {
                 useGlobalPkgs = true;
                 useUserPackages = true;
-                extraSpecialArgs = { inherit pkgsUnstable; };
+                extraSpecialArgs = {
+                  inherit inputs;
+                  inherit pkgsUnstable;
+                };
                 users = lib.mapAttrs (_: modules: { imports = modules; }) homeModules;
               };
             }
@@ -166,7 +181,7 @@
       nixosConfigurations = lib.mapAttrs mkNixosHost activeHosts;
 
       darwinConfigurations."MacBook-Pro" = nix-darwin.lib.darwinSystem {
-        system = "aarch64-darwin";
+        pkgs = mkPkgsUnstable "aarch64-darwin";
 
         specialArgs = {
           inherit self inputs;
@@ -202,11 +217,7 @@
       checks = forAllSystems (
         system:
         let
-          pkgsCheck =
-            if lib.hasSuffix "darwin" system then
-              mkPkgsUnstable system
-            else
-              mkPkgs system;
+          pkgsCheck = if lib.hasSuffix "darwin" system then mkPkgsUnstable system else mkPkgs system;
 
           mkCheck =
             name: toolInputs: command:
