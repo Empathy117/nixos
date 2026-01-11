@@ -180,18 +180,92 @@
         max_width = 1200;
         max_height = 900;
       };
+      plugin = {
+        prepend_fetchers = [
+          {
+            id = "git";
+            url = "*";
+            run = "git";
+          }
+          {
+            id = "git";
+            url = "*/";
+            run = "git";
+          }
+        ];
+      };
+    };
+    keymap = {
+      mgr.prepend_keymap = [
+        {
+          on = [
+            "g"
+            "l"
+          ];
+          run = "shell --block -- lazygit";
+          desc = "Lazygit";
+        }
+      ];
     };
     plugins = {
       git = pkgs.yaziPlugins.git;
       "full-border" = pkgs.yaziPlugins."full-border";
       yatline = pkgs.yaziPlugins.yatline;
       "yatline-catppuccin" = pkgs.yaziPlugins."yatline-catppuccin";
+      "yatline-githead" = pkgs.yaziPlugins."yatline-githead";
     };
     initLua = ''
       require("full-border"):setup()
       require("git"):setup()
-      require("yatline"):setup()
-      require("yatline-catppuccin"):setup()
+      require("yatline"):setup({
+        show_background = false,
+        header_line = {
+          left = {
+            section_a = {
+              { type = "line", custom = false, name = "tabs", params = { "left" } },
+            },
+            section_b = {},
+            section_c = {},
+          },
+          right = {
+            section_a = {
+              { type = "string", custom = false, name = "date", params = { "%A, %d %B %Y" } },
+            },
+            section_b = {
+              { type = "string", custom = false, name = "date", params = { "%X" } },
+            },
+            section_c = {},
+          },
+        },
+        status_line = {
+          left = {
+            section_a = {
+              { type = "string", custom = false, name = "tab_mode" },
+            },
+            section_b = {
+              { type = "string", custom = false, name = "hovered_size" },
+            },
+            section_c = {
+              { type = "string", custom = false, name = "hovered_path" },
+              { type = "coloreds", custom = false, name = "count" },
+            },
+          },
+          right = {
+            section_a = {
+              { type = "string", custom = false, name = "cursor_position" },
+            },
+            section_b = {
+              { type = "string", custom = false, name = "cursor_percentage" },
+            },
+            section_c = {
+              { type = "coloreds", custom = false, name = "githead" },
+              { type = "string", custom = false, name = "hovered_file_extension", params = { true } },
+              { type = "coloreds", custom = false, name = "permissions" },
+            },
+          },
+        },
+      }, require("yatline-catppuccin"):setup())
+      require("yatline-githead"):setup()
     '';
   };
 
