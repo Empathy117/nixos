@@ -1,4 +1,9 @@
-{ config, pkgs, ... }:
+{
+  config,
+  pkgs,
+  inputs ? { },
+  ...
+}:
 let
   ghosttyConfig = ''
     theme = "light:Catppuccin Latte,dark:Catppuccin Mocha"
@@ -35,6 +40,13 @@ let
 
     macos-icon = glass
   '';
+
+  opencodePkg =
+    if inputs ? opencode then
+      inputs.opencode.packages.${pkgs.stdenv.hostPlatform.system}.default
+    else
+      pkgs.opencode;
+
 in
 {
   home.username = "empathy";
@@ -42,15 +54,13 @@ in
   home.stateVersion = "25.05";
   home.enableNixpkgsReleaseCheck = false;
 
-  # Apps are already managed via nix-darwin in /Applications (Launchpad-ready).
-  # Disable Home Manager's ~/Applications/Home Manager Apps links.
   targets.darwin.linkApps.enable = false;
 
   home.sessionPath = [
     "/etc/profiles/per-user/${config.home.username}/bin"
   ];
 
-  home.packages = 
+  home.packages =
     (with pkgs; [
       codex
       claude-code
@@ -58,16 +68,34 @@ in
       nixfmt
       statix
       rsync
+      tailscale
+      tmux
     ])
     ++ [
+      opencodePkg
     ];
 
-  # Ghostty on macOS may prefer the App Support config path.
   xdg.configFile."ghostty/config".text = ghosttyConfig;
   home.file."Library/Application Support/com.mitchellh.ghostty/config" = {
     text = ghosttyConfig;
     force = true;
   };
+  home.file.".skhdrc".text = ''
+    cmd - space : open -b com.apple.apps.launcher
+
+    cmd - h : yabai -m window --focus west
+    cmd - j : yabai -m window --focus south
+    cmd - k : yabai -m window --focus north
+    cmd - l : yabai -m window --focus east
+
+    cmd + shift - h : yabai -m window --swap west
+    cmd + shift - j : yabai -m window --swap south
+    cmd + shift - k : yabai -m window --swap north
+    cmd + shift - l : yabai -m window --swap east
+
+    ctrl + shift - f : yabai -m window --toggle zoom-fullscreen
+    ctrl + shift - t : yabai -m window --toggle float
+  '';
 
   imports = [
     ../../modules/cli/modern.nix
