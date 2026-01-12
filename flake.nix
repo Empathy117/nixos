@@ -24,9 +24,8 @@
       url = "tarball+https://github.com/nix-darwin/nix-darwin/archive/refs/heads/master.tar.gz";
       inputs.nixpkgs.follows = "nixpkgs-unstable";
     };
-    home-manager-release = {
-      # Use a branch tarball to avoid GitHub API rate limits.
-      url = "tarball+https://github.com/nix-community/home-manager/archive/refs/heads/release-25.11.tar.gz";
+    home-manager-unstable = {
+      url = "github:nix-community/home-manager";
       inputs.nixpkgs.follows = "nixpkgs-unstable";
     };
 
@@ -55,7 +54,7 @@
       nur,
       nix-darwin,
       home-manager,
-      home-manager-release,
+      home-manager-unstable,
       nixvim,
       ...
     }:
@@ -107,6 +106,7 @@
         wsl = {
           enable = true;
           system = "x86_64-linux";
+          useUnstable = true;
           systemModules = [
             ./hosts/wsl
           ];
@@ -143,11 +143,17 @@
         name: cfg:
         let
           system = cfg.system or defaultSystem;
-          pkgs = mkPkgs system;
+          useUnstable = cfg.useUnstable or false;
+          libForHost =
+            if useUnstable then nixpkgs-unstable.lib else lib;
+          pkgs =
+            if useUnstable then mkPkgsUnstable system else mkPkgs system;
           pkgsUnstable = mkPkgsUnstable system;
           homeModules = cfg.homeModules or { };
+          homeManagerModule =
+            if useUnstable then home-manager-unstable.nixosModules.home-manager else home-manager.nixosModules.home-manager;
         in
-        lib.nixosSystem {
+        libForHost.nixosSystem {
           inherit pkgs;
           specialArgs = {
             inherit inputs;
@@ -156,12 +162,12 @@
           // (cfg.specialArgs or { });
           modules = [
             (_: {
-              networking.hostName = lib.mkDefault name;
+              networking.hostName = libForHost.mkDefault name;
             })
           ]
           ++ (cfg.systemModules or [ ])
-          ++ lib.optionals (homeModules != { }) [
-            home-manager.nixosModules.home-manager
+          ++ libForHost.optionals (homeModules != { }) [
+            homeManagerModule
             {
               home-manager = {
                 useGlobalPkgs = true;
@@ -170,7 +176,7 @@
                   inherit inputs;
                   inherit pkgsUnstable;
                 };
-                users = lib.mapAttrs (_: modules: { imports = modules; }) homeModules;
+                users = libForHost.mapAttrs (_: modules: { imports = modules; }) homeModules;
               };
             }
           ];
@@ -188,7 +194,7 @@
         };
 
         modules = [
-          home-manager-release.darwinModules.home-manager
+          home-manager-unstable.darwinModules.home-manager
           (_: {
             nixpkgs = {
               config.allowUnfree = true;
