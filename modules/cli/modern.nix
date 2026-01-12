@@ -37,12 +37,12 @@
       if not set -q fish_color_command
         if type -q defaults
           if test (defaults read -g AppleInterfaceStyle 2>/dev/null) = "Dark"
-            fish_config theme choose "ayu-mirage"
+            fish_config theme choose "ayu Mirage"
           else
-            fish_config theme choose "snow-day"
+            fish_config theme choose "Snow Day"
           end
         else
-          fish_config theme choose "ayu-mirage"
+          fish_config theme choose "ayu Mirage"
         end
       end
     '';

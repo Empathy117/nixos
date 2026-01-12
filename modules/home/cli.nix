@@ -28,6 +28,7 @@ in
     nixfmt
     openssl
     python314
+    pyright
     statix
     vim
     wget

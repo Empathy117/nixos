@@ -1,5 +1,4 @@
-{ pkgsUnstable, ... }:
-{ pkgs, ... }:
+{ pkgs, pkgsUnstable ? pkgs, ... }:
 {
   programs.nixvim = {
     enable = true;

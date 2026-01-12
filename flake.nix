@@ -69,6 +69,20 @@
               "https://registry.npmjs.org/" = "https://registry.npmmirror.com/";
             };
           });
+          opencode = prev.opencode.overrideAttrs (old: {
+            node_modules = old.node_modules.overrideAttrs (nmOld: {
+              buildPhase = ''
+                echo "registry=https://registry.npmmirror.com" > .npmrc
+                ${nmOld.buildPhase}
+              '';
+              env = (nmOld.env or { }) // {
+                NPM_CONFIG_REGISTRY = "https://registry.npmmirror.com";
+                npm_config_registry = "https://registry.npmmirror.com";
+                BUN_CONFIG_REGISTRY = "https://registry.npmmirror.com";
+                BUN_INSTALL_REGISTRY = "https://registry.npmmirror.com";
+              };
+            });
+          });
         })
       ];
       supportedSystems = [
