@@ -18,11 +18,18 @@ let
     ms-azuretools.vscode-docker
     redhat.vscode-yaml
     ms-vscode-remote.remote-containers
-    alexkrechik.cucumberautocomplete
     humao.rest-client
   ];
 
   marketplaceExtensions = [
+    (pkgs.vscode-utils.buildVscodeMarketplaceExtension {
+      mktplcRef = {
+        publisher = "alexkrechik";
+        name = "cucumberautocomplete";
+        version = "3.0.5";
+        sha256 = "sha256-Tgqd4uoVgGJQKlj4JUM1CrjQhbi0qv9bAGz5NIHyofQ=";
+      };
+    })
     (pkgs.vscode-utils.buildVscodeMarketplaceExtension {
       mktplcRef = {
         publisher = "pinage404";
