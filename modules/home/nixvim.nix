@@ -1,4 +1,8 @@
-{ pkgs, pkgsUnstable ? pkgs, ... }:
+{
+  pkgs,
+  pkgsUnstable ? pkgs,
+  ...
+}:
 {
   programs.nixvim = {
     enable = true;
@@ -8,8 +12,9 @@
       settings.transparent_background = true;
     };
 
-    extraPlugins = with pkgs.vimPlugins; [
-      opencode-nvim
+    extraPlugins = [
+      pkgs.vimPlugins.opencode-nvim
+      pkgs.vimPlugins."vim-suda"
     ];
 
     opts = {

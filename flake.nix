@@ -85,30 +85,25 @@
           });
         })
         (final: prev: {
-          yaziPlugins =
-            let
-              patchYatline =
-                pkg:
-                pkg.overrideAttrs (old: {
-                  postPatch = (old.postPatch or "") + ''
-                    render_files=$(grep -rl "ya\\.render" . || true)
-                    if [ -n "$render_files" ]; then
-                      substituteInPlace $render_files --replace "ya.render" "ui.render"
-                    fi
-                    truncate_files=$(grep -rl "ya\\.truncate" . || true)
-                    if [ -n "$truncate_files" ]; then
-                      substituteInPlace $truncate_files --replace "ya.truncate" "ui.truncate"
-                    fi
-                  '';
-                });
-            in
-            prev.yaziPlugins
-            // {
-              yatline = patchYatline prev.yaziPlugins.yatline;
-              "yatline-catppuccin" = patchYatline prev.yaziPlugins."yatline-catppuccin";
-              "yatline-githead" = patchYatline prev.yaziPlugins."yatline-githead";
+          yaziPlugins = prev.yaziPlugins // {
+            githead = prev.yaziPlugins.mkYaziPlugin {
+              pname = "githead.yazi";
+              version = "2.0.2";
+              src = prev.fetchFromGitHub {
+                owner = "llanosrocas";
+                repo = "githead.yazi";
+                rev = "v2.0.2";
+                hash = "sha256-c8jwfVrgQBLii4Yv3B020TdlYyt4VI70pNzqbuXyOgE=";
+              };
+              meta = {
+                description = "Git status header for yazi";
+                homepage = "https://github.com/llanosrocas/githead.yazi";
+                license = prev.lib.licenses.mit;
+              };
             };
+          };
         })
+
       ];
       supportedSystems = [
         "x86_64-linux"

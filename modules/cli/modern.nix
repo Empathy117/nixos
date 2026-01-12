@@ -204,67 +204,102 @@
           run = "shell --block -- lazygit";
           desc = "Lazygit";
         }
+        {
+          on = [
+            "R"
+            "p"
+            "p"
+          ];
+          run = "plugin sudo -- paste";
+          desc = "Sudo paste";
+        }
+        {
+          on = [
+            "R"
+            "P"
+          ];
+          run = "plugin sudo -- paste --force";
+          desc = "Sudo paste (force)";
+        }
+        {
+          on = [
+            "R"
+            "r"
+          ];
+          run = "plugin sudo -- rename";
+          desc = "Sudo rename";
+        }
+        {
+          on = [
+            "R"
+            "p"
+            "l"
+          ];
+          run = "plugin sudo -- link";
+          desc = "Sudo link";
+        }
+        {
+          on = [
+            "R"
+            "p"
+            "r"
+          ];
+          run = "plugin sudo -- link --relative";
+          desc = "Sudo link (relative)";
+        }
+        {
+          on = [
+            "R"
+            "p"
+            "L"
+          ];
+          run = "plugin sudo -- hardlink";
+          desc = "Sudo hardlink";
+        }
+        {
+          on = [
+            "R"
+            "a"
+          ];
+          run = "plugin sudo -- create";
+          desc = "Sudo create";
+        }
+        {
+          on = [
+            "R"
+            "d"
+          ];
+          run = "plugin sudo -- remove";
+          desc = "Sudo trash";
+        }
+        {
+          on = [
+            "R"
+            "D"
+          ];
+          run = "plugin sudo -- remove --permanently";
+          desc = "Sudo delete";
+        }
+        {
+          on = [
+            "R"
+            "m"
+          ];
+          run = "plugin sudo -- chmod";
+          desc = "Sudo chmod";
+        }
       ];
     };
     plugins = {
       git = pkgs.yaziPlugins.git;
       "full-border" = pkgs.yaziPlugins."full-border";
-      yatline = pkgs.yaziPlugins.yatline;
-      "yatline-catppuccin" = pkgs.yaziPlugins."yatline-catppuccin";
-      "yatline-githead" = pkgs.yaziPlugins."yatline-githead";
+      githead = pkgs.yaziPlugins.githead;
+      sudo = pkgs.yaziPlugins.sudo;
     };
     initLua = ''
       require("full-border"):setup()
       require("git"):setup()
-      require("yatline"):setup({
-        show_background = false,
-        header_line = {
-          left = {
-            section_a = {
-              { type = "line", custom = false, name = "tabs", params = { "left" } },
-            },
-            section_b = {},
-            section_c = {},
-          },
-          right = {
-            section_a = {
-              { type = "string", custom = false, name = "date", params = { "%A, %d %B %Y" } },
-            },
-            section_b = {
-              { type = "string", custom = false, name = "date", params = { "%X" } },
-            },
-            section_c = {},
-          },
-        },
-        status_line = {
-          left = {
-            section_a = {
-              { type = "string", custom = false, name = "tab_mode" },
-            },
-            section_b = {
-              { type = "string", custom = false, name = "hovered_size" },
-            },
-            section_c = {
-              { type = "string", custom = false, name = "hovered_path" },
-              { type = "coloreds", custom = false, name = "count" },
-            },
-          },
-          right = {
-            section_a = {
-              { type = "string", custom = false, name = "cursor_position" },
-            },
-            section_b = {
-              { type = "string", custom = false, name = "cursor_percentage" },
-            },
-            section_c = {
-              { type = "coloreds", custom = false, name = "githead" },
-              { type = "string", custom = false, name = "hovered_file_extension", params = { true } },
-              { type = "coloreds", custom = false, name = "permissions" },
-            },
-          },
-        },
-      }, require("yatline-catppuccin"):setup())
-      require("yatline-githead"):setup()
+      require("githead"):setup()
     '';
   };
 
@@ -277,5 +312,6 @@
 
   home.packages = [
     pkgs.ripgrep
+    pkgs.nushell
   ];
 }
