@@ -84,6 +84,31 @@
             });
           });
         })
+        (final: prev: {
+          yaziPlugins =
+            let
+              patchYatline =
+                pkg:
+                pkg.overrideAttrs (old: {
+                  postPatch = (old.postPatch or "") + ''
+                    render_files=$(grep -rl "ya\\.render" . || true)
+                    if [ -n "$render_files" ]; then
+                      substituteInPlace $render_files --replace "ya.render" "ui.render"
+                    fi
+                    truncate_files=$(grep -rl "ya\\.truncate" . || true)
+                    if [ -n "$truncate_files" ]; then
+                      substituteInPlace $truncate_files --replace "ya.truncate" "ui.truncate"
+                    fi
+                  '';
+                });
+            in
+            prev.yaziPlugins
+            // {
+              yatline = patchYatline prev.yaziPlugins.yatline;
+              "yatline-catppuccin" = patchYatline prev.yaziPlugins."yatline-catppuccin";
+              "yatline-githead" = patchYatline prev.yaziPlugins."yatline-githead";
+            };
+        })
       ];
       supportedSystems = [
         "x86_64-linux"
@@ -158,14 +183,15 @@
         let
           system = cfg.system or defaultSystem;
           useUnstable = cfg.useUnstable or false;
-          libForHost =
-            if useUnstable then nixpkgs-unstable.lib else lib;
-          pkgs =
-            if useUnstable then mkPkgsUnstable system else mkPkgs system;
+          libForHost = if useUnstable then nixpkgs-unstable.lib else lib;
+          pkgs = if useUnstable then mkPkgsUnstable system else mkPkgs system;
           pkgsUnstable = mkPkgsUnstable system;
           homeModules = cfg.homeModules or { };
           homeManagerModule =
-            if useUnstable then home-manager-unstable.nixosModules.home-manager else home-manager.nixosModules.home-manager;
+            if useUnstable then
+              home-manager-unstable.nixosModules.home-manager
+            else
+              home-manager.nixosModules.home-manager;
         in
         libForHost.nixosSystem {
           inherit pkgs;
