@@ -18,5 +18,5 @@
 
   networking.hostName = "wsl";
 
-  users.users.nixos.shell = pkgs.zsh;
+  users.users.nixos.shell = pkgs.fish;
 }

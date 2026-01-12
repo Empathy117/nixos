@@ -1,9 +1,4 @@
-{
-  config,
-  lib,
-  pkgs,
-  ...
-}:
+{ pkgs, ... }:
 {
   manual.manpages.enable = false;
 
@@ -60,6 +55,7 @@
   programs.starship = {
     enable = true;
     enableFishIntegration = true;
+    enableZshIntegration = true;
 
     settings = {
       add_newline = false;
@@ -117,6 +113,7 @@
   programs.zoxide = {
     enable = true;
     enableFishIntegration = true;
+    enableZshIntegration = true;
   };
 
   programs.fd = {
@@ -132,6 +129,7 @@
   programs.fzf = {
     enable = true;
     enableFishIntegration = true;
+    enableZshIntegration = true;
 
     defaultCommand = "fd --type f --hidden --follow --exclude .git";
     fileWidgetCommand = "fd --type f --hidden --follow --exclude .git";
@@ -155,6 +153,7 @@
   programs.atuin = {
     enable = true;
     enableFishIntegration = true;
+    enableZshIntegration = true;
   };
 
   programs.yazi = {
@@ -273,6 +272,7 @@
     enable = true;
     silent = true;
     nix-direnv.enable = true;
+    enableZshIntegration = true;
   };
 
   home.packages = [

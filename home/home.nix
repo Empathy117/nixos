@@ -11,7 +11,6 @@ _: {
     ../modules/home/ssh-key.nix
     ../modules/home/nixvim.nix
     ../modules/home/zsh.nix
-    ../modules/home/direnv.nix
     ../modules/home/nodejs
     ../modules/home/opencode.nix
   ];

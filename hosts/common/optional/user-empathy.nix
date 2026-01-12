@@ -18,7 +18,7 @@
       "docker"
       "git"
     ];
-    shell = pkgs.zsh;
+    shell = pkgs.fish;
     description = "Primary development account";
     openssh.authorizedKeys.keys = [
       "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIJrO/0OgAxwADiPm93IrC9Y87Kfc6pr1OhkbD+bF77ge empathy@DyldadeMacBook-Pro.local"

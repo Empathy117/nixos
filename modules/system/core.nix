@@ -28,6 +28,7 @@ _: {
   time.timeZone = "Asia/Shanghai"; # 所有机器都用这个时区
 
   programs.zsh.enable = true;
+  programs.fish.enable = true;
 
   # --- IPv6 ---
   networking.enableIPv6 = false;
