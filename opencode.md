@@ -21,3 +21,5 @@
    - 最小配置：只写 plugin + google_auth  
    - 增强配置：比如主题、默认模型、权限等
 你选个方向，我就直接改你的 Nix 配置。
+
+nvim: bufferline、trouble 诊断面板、todo-comments、project.nvim）
