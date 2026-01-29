@@ -13,10 +13,11 @@ let
     arrterian.nix-env-selector
     bbenoist.nix
     ms-python.python
-    ms-python.vscode-pylance
+    ms-pyright.pyright
     charliermarsh.ruff
     ms-azuretools.vscode-docker
     redhat.vscode-yaml
+    redhat.java
     ms-vscode-remote.remote-containers
     humao.rest-client
   ];
