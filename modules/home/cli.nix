@@ -35,6 +35,8 @@ in
     deadnix
     lf
     nixd
+    jdt-language-server
+    temurin-bin-17
     claude-code
     codex
     git-filter-repo

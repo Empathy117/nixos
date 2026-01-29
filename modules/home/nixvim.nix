@@ -260,6 +260,7 @@
       servers = {
         pylsp.enable = true;
         nixd.enable = true;
+        jdtls.enable = true;
       };
       keymaps = {
         diagnostic = {
