@@ -43,14 +43,6 @@ let
     appName = "BaiduNetdisk_mac.app";
   };
 
-  infuse = mkDmgApp {
-    pname = "infuse";
-    version = "8.3.4";
-    url = "file:///Users/empathy/Library/Mobile%20Documents/com~apple~CloudDocs/dmg/Infuse.dmg";
-    hash = "sha256-FNQJ27O2c62w9yMx931qPwtmpSBESDRAEZ6b6mrn9EU=";
-    appName = "Infuse.app";
-  };
-
   emacsJimeh = mkDmgApp {
     pname = "emacs-jimeh";
     version = "30.2-1";
@@ -91,7 +83,6 @@ let
     sublimeText
     clashVergeRev
     baiduNetdisk
-    infuse
     emacsJimeh
     steam
   ];
