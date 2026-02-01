@@ -58,23 +58,6 @@ in
     force = true;
   };
 
-  home.file.".skhdrc".text = ''
-    cmd - space : open -b com.apple.apps.launcher
-
-    cmd - h : yabai -m window --focus west
-    cmd - j : yabai -m window --focus south
-    cmd - k : yabai -m window --focus north
-    cmd - l : yabai -m window --focus east
-
-    cmd + shift - h : yabai -m window --swap west
-    cmd + shift - j : yabai -m window --swap south
-    cmd + shift - k : yabai -m window --swap north
-    cmd + shift - l : yabai -m window --swap east
-
-    ctrl + shift - f : yabai -m window --toggle zoom-fullscreen
-    ctrl + shift - t : yabai -m window --toggle float
-  '';
-
   imports = [
     ../../modules/home/cli.nix
     ../../modules/home/git.nix
