@@ -40,17 +40,14 @@ let
         cp -R "$app" "$out/Applications/${appName}"
 
         mkdir -p "$out/bin"
-        ${lib.concatMapStringsSep "\n" (
-          link:
-          ''
-            target="$out/Applications/${appName}/${link.path}"
-            if [ ! -e "$target" ]; then
-              echo "Expected ${link.name} target at $target, but it was not found."
-              exit 1
-            fi
-            ln -s "$target" "$out/bin/${link.name}"
-          ''
-        ) binLinks}
+        ${lib.concatMapStringsSep "\n" (link: ''
+          target="$out/Applications/${appName}/${link.path}"
+          if [ ! -e "$target" ]; then
+            echo "Expected ${link.name} target at $target, but it was not found."
+            exit 1
+          fi
+          ln -s "$target" "$out/bin/${link.name}"
+        '') binLinks}
         runHook postInstall
       '';
 
@@ -127,23 +124,21 @@ let
         cp -R "$app" "$out/Applications/${appName}"
 
         mkdir -p "$out/bin"
-        ${lib.concatMapStringsSep "\n" (
-          link:
-          ''
-            target="$out/Applications/${appName}/${link.path}"
-            if [ ! -e "$target" ]; then
-              echo "Expected ${link.name} target at $target, but it was not found."
-              exit 1
-            fi
-            ln -s "$target" "$out/bin/${link.name}"
-          ''
-        ) binLinks}
+        ${lib.concatMapStringsSep "\n" (link: ''
+          target="$out/Applications/${appName}/${link.path}"
+          if [ ! -e "$target" ]; then
+            echo "Expected ${link.name} target at $target, but it was not found."
+            exit 1
+          fi
+          ln -s "$target" "$out/bin/${link.name}"
+        '') binLinks}
         runHook postInstall
       '';
 
       dontFixup = true;
       meta.platforms = lib.platforms.darwin;
     };
+
 in
 {
   inherit mkZipApp mkDmgApp;
