@@ -13,99 +13,6 @@ let
     inherit pkgs lib;
     inherit (appBuilders) mkZipApp mkDmgApp;
   };
-  mkTccApp =
-    {
-      pname,
-      version,
-      appName,
-      displayName,
-      bundleId,
-      binName,
-      binPath,
-    }:
-    pkgs.stdenvNoCC.mkDerivation {
-      inherit pname version;
-
-      dontUnpack = true;
-
-      installPhase = ''
-                app="$out/Applications/${appName}"
-                mkdir -p "$app/Contents/MacOS" "$app/Contents/Resources" "$out/bin"
-
-                cp ${binPath} "$app/Contents/MacOS/${binName}"
-                chmod +x "$app/Contents/MacOS/${binName}"
-
-                cat > "$app/Contents/Info.plist" <<EOF
-        <?xml version="1.0" encoding="UTF-8"?>
-        <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-        <plist version="1.0">
-          <dict>
-            <key>CFBundleDisplayName</key>
-            <string>${displayName}</string>
-            <key>CFBundleName</key>
-            <string>${displayName}</string>
-            <key>CFBundleIdentifier</key>
-            <string>${bundleId}</string>
-            <key>CFBundleExecutable</key>
-            <string>${binName}</string>
-            <key>CFBundlePackageType</key>
-            <string>APPL</string>
-            <key>CFBundleShortVersionString</key>
-            <string>${version}</string>
-            <key>CFBundleVersion</key>
-            <string>${version}</string>
-            <key>LSUIElement</key>
-            <true/>
-          </dict>
-        </plist>
-        EOF
-                echo "APPL????" > "$app/Contents/PkgInfo"
-
-                cat > "$out/bin/${binName}" <<EOF
-        #!/bin/sh
-        exec "$app/Contents/MacOS/${binName}" "\$@"
-        EOF
-                chmod +x "$out/bin/${binName}"
-      '';
-
-      dontFixup = true;
-      meta.platforms = lib.platforms.darwin;
-    };
-  skhdApp = mkTccApp {
-    pname = "skhd-app";
-    version = pkgs.skhd.version;
-    appName = "Skhd.app";
-    displayName = "Skhd";
-    bundleId = "com.empathy.skhd";
-    binName = "skhd";
-    binPath = "${pkgs.skhd}/bin/skhd";
-  };
-  yabaiApp = mkTccApp {
-    pname = "yabai-app";
-    version = pkgs.yabai.version;
-    appName = "Yabai.app";
-    displayName = "Yabai";
-    bundleId = "com.empathy.yabai";
-    binName = "yabai";
-    binPath = "${pkgs.yabai}/bin/yabai";
-  };
-  sketchybarBundle = pkgs.stdenvNoCC.mkDerivation {
-    pname = "sketchybar-config";
-    version = "official";
-    src = ./sketchybar;
-    dontUnpack = true;
-    installPhase = ''
-      mkdir -p "$out/plugins"
-      install -m 0644 "$src/sketchybarrc" "$out/sketchybarrc"
-      install -m 0755 "$src/plugins/"*.sh "$out/plugins/"
-    '';
-    dontFixup = true;
-  };
-  sketchybarConfig = ''
-    #!/usr/bin/env bash
-    CONFIG_DIR="${sketchybarBundle}"
-    . "${sketchybarBundle}/sketchybarrc"
-  '';
 in
 {
   nixpkgs.config.allowUnfree = true;
@@ -137,8 +44,6 @@ in
 
   environment.systemPackages = [
     pkgs.vim
-    skhdApp
-    yabaiApp
     pkgs.sketchybar
   ]
   ++ apps.all;
@@ -167,52 +72,6 @@ in
     ];
   };
 
-  services.skhd.enable = false;
-
-  services.yabai = {
-    enable = true;
-    enableScriptingAddition = true;
-    extraConfig = ''
-      yabai -m config layout bsp
-      yabai -m config window_placement second_child
-      yabai -m config top_padding 10
-      yabai -m config bottom_padding 10
-      yabai -m config left_padding 10
-      yabai -m config right_padding 10
-      yabai -m config window_gap 10
-
-      yabai -m rule --add app="^System Preferences$" manage=off
-      yabai -m rule --add app="^Activity Monitor$" manage=off
-      yabai -m rule --add app="^Calculator$" manage=off
-      yabai -m rule --add app="^Dictionary$" manage=off
-      yabai -m rule --add app="^App Store$" manage=off
-      yabai -m rule --add title="Preferences" manage=off
-    '';
-  };
-
-  launchd.user.agents.skhd = {
-    serviceConfig = {
-      ProgramArguments = [
-        "${pkgs.skhd}/bin/skhd"
-        "-c"
-        "/Users/empathy/.skhdrc"
-      ];
-      RunAtLoad = true;
-      KeepAlive = true;
-      StandardErrorPath = "/tmp/skhd.err.log";
-      StandardOutPath = "/tmp/skhd.out.log";
-      EnvironmentVariables = {
-        PATH = "${pkgs.yabai}/bin:$HOME/.nix-profile/bin:/etc/profiles/per-user/$USER/bin:/run/current-system/sw/bin:/nix/var/nix/profiles/default/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin";
-      };
-    };
-  };
-  services.sketchybar = {
-    enable = false;
-    config = sketchybarConfig;
-    extraPackages = [
-      yabaiApp
-    ];
-  };
   services.jankyborders = {
     enable = false;
     active_color = "0x88b7e8ff";
@@ -225,7 +84,7 @@ in
 
   system.defaults = {
     dock.autohide = true;
-    dock.mru-spaces = false;
+    dock.mru-spaces = true;
 
     finder.AppleShowAllExtensions = true;
     finder.FXPreferredViewStyle = "clmv";
@@ -315,29 +174,6 @@ in
               type = "standard";
             };
           };
-          "64" = {
-            enabled = 0;
-            value = {
-              parameters = [
-                65535
-                49
-                1048576
-              ];
-              type = "standard";
-            };
-          };
-          "65" = {
-            enabled = 1;
-            value = {
-              parameters = [
-                65535
-                49
-                1572864
-              ];
-              type = "standard";
-            };
-          };
-
           "79" = {
             enabled = 1;
             value = {
