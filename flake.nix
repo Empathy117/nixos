@@ -16,6 +16,7 @@
     };
     opencode = {
       url = "github:anomalyco/opencode";
+      inputs.nixpkgs.follows = "nixpkgs-unstable";
     };
 
     # macOS (nix-darwin)
