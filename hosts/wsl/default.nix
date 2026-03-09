@@ -31,5 +31,9 @@
     "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIGAK76YpWR+nhg5nmghEHkwGV0mx4egzp+kGurwjFipE empathyyiyiqi@gmail.com"
   ];
 
+  environment.systemPackages = [
+    pkgs.google-chrome
+  ];
+
   users.users.nixos.shell = pkgs.fish;
 }
