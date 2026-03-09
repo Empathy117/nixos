@@ -313,5 +313,8 @@
   home.packages = [
     pkgs.ripgrep
     pkgs.nushell
+    pkgs.yt-dlp-light
+    pkgs.ffmpeg
+    pkgs.deno
   ];
 }
