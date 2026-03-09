@@ -7,11 +7,13 @@
 }:
 let
   cfg = config.programs.opencode;
-  opencodeInputPackage =
-    if inputs ? opencode then
+  opencodePackage =
+    if pkgs ? opencode then
+      pkgs.opencode
+    else if inputs ? opencode then
       inputs.opencode.packages.${pkgs.stdenv.hostPlatform.system}.default
     else
-      pkgs.opencode;
+      throw "opencode package is not available in pkgs or inputs";
 in
 {
   options.programs.opencode."oh-my-opencode" = {
@@ -26,7 +28,7 @@ in
 
   config = lib.mkMerge [
     {
-      programs.opencode.package = lib.mkDefault opencodeInputPackage;
+      programs.opencode.package = lib.mkDefault opencodePackage;
     }
 
     (lib.mkIf cfg."oh-my-opencode".enable {

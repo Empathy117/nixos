@@ -18,5 +18,18 @@
 
   networking.hostName = "wsl";
 
+  services.openssh = {
+    enable = true;
+    openFirewall = true;
+    settings = {
+      PasswordAuthentication = false;
+      KbdInteractiveAuthentication = false;
+    };
+  };
+
+  users.users.nixos.openssh.authorizedKeys.keys = [
+    "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIGAK76YpWR+nhg5nmghEHkwGV0mx4egzp+kGurwjFipE empathyyiyiqi@gmail.com"
+  ];
+
   users.users.nixos.shell = pkgs.fish;
 }
