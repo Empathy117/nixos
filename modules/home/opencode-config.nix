@@ -5,10 +5,12 @@
 }:
 let
   opencodeBase =
-    if inputs ? opencode then
+    if pkgs ? opencode then
+      pkgs.opencode
+    else if inputs ? opencode then
       inputs.opencode.packages.${pkgs.stdenv.hostPlatform.system}.default
     else
-      pkgs.opencode;
+      throw "opencode package is not available in pkgs or inputs";
 in
 {
   programs.opencode = {
