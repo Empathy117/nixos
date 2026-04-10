@@ -71,7 +71,7 @@ in
         packageManagerBin =
           {
             npm = "${cfg.package}/bin/npx";
-            pnpm = "${pkgs.nodePackages.pnpm}/bin/pnpx";
+            pnpm = "${pkgs.pnpm}/bin/pnpm dlx";
             yarn = "${pkgs.yarn}/bin/yarn dlx";
             bun = "${pkgs.bun}/bin/bunx";
           }
@@ -81,7 +81,7 @@ in
         home.packages = [
           cfg.package
         ]
-        ++ lib.optional (cfg.packageManager == "pnpm") pkgs.nodePackages.pnpm
+        ++ lib.optional (cfg.packageManager == "pnpm") pkgs.pnpm
         ++ lib.optional (cfg.packageManager == "yarn") pkgs.yarn
         ++ lib.optional (cfg.packageManager == "bun") pkgs.bun
         # 按需包：使用 npx/pnpx 包装器
@@ -94,8 +94,11 @@ in
         # 真正安装的包：从 nixpkgs 获取或构建
         ++ (map (
           pkg:
-          if pkgs.nodePackages ? ${pkg} then
-            pkgs.nodePackages.${pkg}
+          let
+            resolvedPkg = lib.attrByPath [ pkg ] null pkgs;
+          in
+          if resolvedPkg != null && lib.isDerivation resolvedPkg then
+            resolvedPkg
           else
             # 如果 nixpkgs 里没有，创建一个简单的全局安装
             pkgs.runCommand "npm-${pkg}" { buildInputs = [ cfg.package ]; } ''

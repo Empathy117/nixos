@@ -35,6 +35,41 @@ in
           ];
         };
       };
+      mcp = {
+        websearch = {
+          type = "remote";
+          url = "https://mcp.exa.ai/mcp?tools=web_search_exa";
+          enabled = true;
+          oauth = false;
+        };
+        context7 = {
+          type = "remote";
+          url = "https://mcp.context7.com/mcp";
+          enabled = true;
+          oauth = false;
+        };
+        grep_app = {
+          type = "remote";
+          url = "https://mcp.grep.app";
+          enabled = true;
+          oauth = false;
+        };
+        playwright = {
+          type = "local";
+          enabled = true;
+          timeout = 30000;
+          command = [
+            "/etc/profiles/per-user/nixos/bin/npx"
+            "-y"
+            "@playwright/mcp@latest"
+            "--browser"
+            "chrome"
+            "--executable-path"
+            "/run/current-system/sw/bin/google-chrome"
+            "--headless"
+          ];
+        };
+      };
     };
     oh-my-opencode = {
       enable = true;
