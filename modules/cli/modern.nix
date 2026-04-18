@@ -1,4 +1,14 @@
 { pkgs, ... }:
+let
+  nushellPkg =
+    if pkgs.nushell.version == "0.112.1" then
+      # Upstream 0.112.1 currently fails its SHLVL test in our build environment.
+      pkgs.nushell.overrideAttrs (_: {
+        doCheck = false;
+      })
+    else
+      pkgs.nushell;
+in
 {
   manual.manpages.enable = false;
 
@@ -312,7 +322,7 @@
 
   home.packages = [
     pkgs.ripgrep
-    pkgs.nushell
+    nushellPkg
     pkgs.yt-dlp-light
     pkgs.ffmpeg
     pkgs.deno
