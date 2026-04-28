@@ -57,14 +57,6 @@ let
     ];
   };
 
-  steam = mkDmgApp {
-    pname = "steam";
-    version = "latest";
-    url = "https://cdn.fastly.steamstatic.com/client/installer/steam.dmg";
-    hash = "sha256-X1VnDJGv02A6ihDYKhedqQdE/KmPAQZkeJHudA6oS6M=";
-    appName = "Steam.app";
-  };
-
   optionalOn = pkg: lib.optional (lib.meta.availableOn pkgs.stdenv.hostPlatform pkg) pkg;
 
   nixpkgsApps = lib.concatMap optionalOn [
@@ -74,7 +66,6 @@ let
     pkgs.vscode
     pkgs.raycast
     pkgs.iina
-    pkgs.chatgpt
   ];
 
   customApps = [
@@ -83,7 +74,6 @@ let
     clashVergeRev
     baiduNetdisk
     emacsJimeh
-    steam
   ];
 in
 {
