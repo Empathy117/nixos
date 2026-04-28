@@ -75,7 +75,6 @@ let
     pkgs.raycast
     pkgs.iina
     pkgs.chatgpt
-    pkgs.spotify
   ];
 
   customApps = [
