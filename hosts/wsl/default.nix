@@ -2,15 +2,13 @@
 {
   inputs,
   pkgs,
+  lib,
   ...
 }:
 {
   imports = [
     inputs.nixos-wsl.nixosModules.default
-    ../common/global
-    ../common/optional/docker.nix
-    ../common/optional/yoohoo.nix
-    ../common/optional/vscode-remote.nix
+    ../../modules/system/core.nix
   ];
 
   wsl.enable = true;
@@ -36,4 +34,23 @@
   ];
 
   users.users.nixos.shell = pkgs.fish;
+
+  virtualisation.docker = {
+    enable = lib.mkDefault true;
+    daemon.settings."registry-mirrors" = [
+      "https://docker.mirrors.ustc.edu.cn/"
+      "https://docker.mirrors.sjtug.sjtu.edu.cn/"
+      "https://docker.tuna.tsinghua.edu.cn/"
+      "https://docker.nju.edu.cn/"
+      "https://registry.cn-hangzhou.aliyuncs.com/"
+    ];
+  };
+
+  systemd.services.docker.environment = {
+    HTTP_PROXY = "http://127.0.0.1:7890";
+    HTTPS_PROXY = "http://127.0.0.1:7890";
+    NO_PROXY = "localhost,127.0.0.1";
+  };
+
+  services.vscode-server.enable = true;
 }

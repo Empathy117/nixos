@@ -4,57 +4,55 @@
   description = "Java 8 + Spring Boot + React TypeScript 开发环境";
 
   inputs = {
-    nixpkgs.url = "github:NixOS/nixpkgs/nixos-24.11";
-    flake-utils.url = "github:numtide/flake-utils";
+    nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
   };
 
-  outputs = { self, nixpkgs, flake-utils }:
-    flake-utils.lib.eachDefaultSystem (system:
-      let
-        pkgs = import nixpkgs {
-          inherit system;
-          config.allowUnfree = true;
-        };
-      in
-      {
-        devShells.default = pkgs.mkShell {
-          buildInputs = with pkgs; [
-            # Java 开发环境
-            temurin-bin-8  # Eclipse Temurin JDK 8 (OpenJDK)
-            # 或者使用其他 JDK 8 发行版：
-            # openjdk8
-            # zulu8  # Azul Zulu JDK 8
+  outputs = { nixpkgs, ... }:
+    let
+      systems = [
+        "x86_64-linux"
+        "aarch64-darwin"
+      ];
+      forAllSystems = nixpkgs.lib.genAttrs systems;
+    in
+    {
+      devShells = forAllSystems (
+        system:
+        let
+          pkgs = import nixpkgs {
+            inherit system;
+            config.allowUnfree = true;
+          };
+        in
+        {
+          default = pkgs.mkShell {
+            packages = with pkgs; [
+              # Java 开发环境
+              temurin-bin-8
 
-            # Maven 或 Gradle（根据需要选择）
-            maven
-            # gradle
+              # Maven 或 Gradle（根据需要选择）
+              maven
 
-            # Node.js 开发环境
-            nodejs_20  # 或 nodejs_18, nodejs_22
-            pnpm
-            # yarn  # 如果需要
+              # Node.js 开发环境
+              nodejs_22
+              pnpm
+            ];
 
-            # 常用工具
-          ];
+            shellHook = ''
+              echo "======================================"
+              echo "开发环境已激活！"
+              echo "Java: $(java -version 2>&1 | head -1)"
+              echo "Node: $(node --version)"
+              echo "pnpm: $(pnpm --version)"
+              echo "======================================"
 
-          shellHook = ''
-            echo "======================================"
-            echo "开发环境已激活！"
-            echo "Java: $(java -version 2>&1 | head -1)"
-            echo "Node: $(node --version)"
-            echo "pnpm: $(pnpm --version)"
-            echo "======================================"
+              export JAVA_HOME="${pkgs.temurin-bin-8}"
+              export PNPM_HOME="$PWD/.pnpm-store"
+            '';
 
-            # 设置 JAVA_HOME
-            export JAVA_HOME="${pkgs.temurin-bin-8}"
-
-            # pnpm 配置（可选）
-            export PNPM_HOME="$PWD/.pnpm-store"
-          '';
-
-          # 环境变量
-          JAVA_HOME = "${pkgs.temurin-bin-8}";
-        };
-      }
-    );
+            JAVA_HOME = "${pkgs.temurin-bin-8}";
+          };
+        }
+      );
+    };
 }

@@ -16,6 +16,10 @@ in
     enable = true;
 
     interactiveShellInit = ''
+      if test (ulimit -n) -lt 8192
+        ulimit -n 8192
+      end
+
       set -g fish_greeting
 
       set -gx EDITOR vim

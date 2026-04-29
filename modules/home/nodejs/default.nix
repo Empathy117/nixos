@@ -46,7 +46,7 @@ in
 
     enableCorepack = lib.mkOption {
       type = lib.types.bool;
-      default = true;
+      default = false;
       description = "Enable corepack for package manager version management";
     };
   };
@@ -60,7 +60,6 @@ in
         packageManager = lib.mkDefault "pnpm";
         globalPackages = lib.mkDefault [ ];
         installedPackages = lib.mkDefault [ ];
-        enableCorepack = lib.mkDefault false; # 默认禁用防止兼容问题
       };
     }
 

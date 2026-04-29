@@ -3,42 +3,32 @@
   description = "My NixOS configuration";
 
   inputs = {
-    nixpkgs = {
-      # Use a branch tarball to avoid GitHub API rate limits.
-      url = "tarball+https://github.com/NixOS/nixpkgs/archive/refs/heads/nixos-25.11.tar.gz";
-    };
-    nixpkgs-unstable = {
-      # Use a branch tarball to avoid GitHub API rate limits.
-      url = "tarball+https://github.com/NixOS/nixpkgs/archive/refs/heads/nixos-unstable.tar.gz";
-    };
+    nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
+
     nur = {
       url = "github:nix-community/NUR";
+      inputs.nixpkgs.follows = "nixpkgs";
     };
     opencode = {
       url = "github:anomalyco/opencode";
-      inputs.nixpkgs.follows = "nixpkgs-unstable";
+      inputs.nixpkgs.follows = "nixpkgs";
     };
 
-    # macOS (nix-darwin)
     nix-darwin = {
-      # Use a branch tarball to avoid GitHub API rate limits.
-      url = "tarball+https://github.com/nix-darwin/nix-darwin/archive/refs/heads/master.tar.gz";
-      inputs.nixpkgs.follows = "nixpkgs-unstable";
+      url = "github:nix-darwin/nix-darwin/master";
+      inputs.nixpkgs.follows = "nixpkgs";
     };
-    home-manager-unstable = {
-      url = "github:nix-community/home-manager";
-      inputs.nixpkgs.follows = "nixpkgs-unstable";
+    home-manager = {
+      url = "github:nix-community/home-manager/master";
+      inputs.nixpkgs.follows = "nixpkgs";
     };
 
     nixos-wsl = {
       url = "github:nix-community/NixOS-WSL";
+      inputs.nixpkgs.follows = "nixpkgs";
     };
     nixvim = {
       url = "github:nix-community/nixvim";
-      inputs.nixpkgs.follows = "nixpkgs-unstable";
-    };
-    home-manager = {
-      url = "github:nix-community/home-manager/release-25.11";
       inputs.nixpkgs.follows = "nixpkgs";
     };
     nixos-vscode-server = {
@@ -51,17 +41,14 @@
     inputs@{
       self,
       nixpkgs,
-      nixpkgs-unstable,
       nur,
       nix-darwin,
       home-manager,
-      home-manager-unstable,
       nixvim,
       ...
     }:
     let
       inherit (nixpkgs) lib;
-      defaultSystem = "x86_64-linux";
       overlays = [
         nur.overlays.default
         (final: prev: {
@@ -110,7 +97,7 @@
         "x86_64-linux"
         "aarch64-darwin"
       ];
-      forAllSystems = f: lib.genAttrs supportedSystems (system: f system);
+      forAllSystems = f: lib.genAttrs supportedSystems f;
 
       mkPkgs =
         system:
@@ -119,147 +106,54 @@
           config.allowUnfree = true;
           inherit overlays;
         };
-      mkPkgsUnstable =
-        system:
-        import nixpkgs-unstable {
-          inherit system;
-          config.allowUnfree = true;
-          inherit overlays;
-        };
-
-      pkgsDefault = mkPkgs defaultSystem;
-      pkgsUnstableDefault = mkPkgsUnstable defaultSystem;
       repoSrc = lib.cleanSource ./.;
 
-      homeBaseModules = [
+      wslHomeModules = [
         nixvim.homeModules.default
-        ./home/home.nix
+        ./home/profiles/linux-cli.nix
         ./modules/vscode/remote.nix
       ];
-
-      hostDefs = {
-        wsl = {
-          enable = true;
-          system = "x86_64-linux";
-          useUnstable = true;
-          systemModules = [
-            ./hosts/wsl
-          ];
-          homeModules = {
-            nixos = homeBaseModules;
-          };
-        };
-
-        devbox = {
-          enable = false;
-          system = "x86_64-linux";
-          systemModules = [
-            ./hosts/devbox
-          ];
-          homeModules = {
-            empathy = homeBaseModules;
-          };
-        };
-
-        lenovo = {
-          enable = true;
-          system = "x86_64-linux";
-          systemModules = [
-            ./hosts/lenovo # 叠加该主机特有配置
-          ];
-          homeModules = {
-            empathy = homeBaseModules;
-          };
-        };
-
-      };
-
-      mkNixosHost =
-        name: cfg:
-        let
-          system = cfg.system or defaultSystem;
-          useUnstable = cfg.useUnstable or false;
-          libForHost = if useUnstable then nixpkgs-unstable.lib else lib;
-          pkgs = if useUnstable then mkPkgsUnstable system else mkPkgs system;
-          pkgsUnstable = mkPkgsUnstable system;
-          homeModules = cfg.homeModules or { };
-          homeManagerModule =
-            if useUnstable then
-              home-manager-unstable.nixosModules.home-manager
-            else
-              home-manager.nixosModules.home-manager;
-        in
-        libForHost.nixosSystem {
-          inherit pkgs;
-          specialArgs = {
-            inherit inputs;
-            inherit pkgsUnstable;
-          }
-          // (cfg.specialArgs or { });
-          modules = [
-            (_: {
-              networking.hostName = libForHost.mkDefault name;
-            })
-          ]
-          ++ (cfg.systemModules or [ ])
-          ++ libForHost.optionals (homeModules != { }) [
-            homeManagerModule
-            {
-              home-manager = {
-                useGlobalPkgs = true;
-                useUserPackages = true;
-                extraSpecialArgs = {
-                  inherit inputs;
-                  inherit pkgsUnstable;
-                };
-                users = libForHost.mapAttrs (_: modules: { imports = modules; }) homeModules;
-              };
-            }
-          ];
-        };
-      activeHosts = lib.filterAttrs (_: cfg: cfg.enable or true) hostDefs;
     in
     {
-      nixosConfigurations = lib.mapAttrs mkNixosHost activeHosts;
+      nixosConfigurations.wsl = lib.nixosSystem {
+        system = "x86_64-linux";
+        pkgs = mkPkgs "x86_64-linux";
+        specialArgs = {
+          inherit inputs;
+        };
+        modules = [
+          home-manager.nixosModules.home-manager
+          ./hosts/wsl
+          {
+            home-manager = {
+              useGlobalPkgs = true;
+              useUserPackages = true;
+              extraSpecialArgs = {
+                inherit inputs;
+              };
+              users.nixos.imports = wslHomeModules;
+            };
+          }
+        ];
+      };
 
       darwinConfigurations."MacBook-Pro" = nix-darwin.lib.darwinSystem {
-        pkgs = mkPkgsUnstable "aarch64-darwin";
+        pkgs = mkPkgs "aarch64-darwin";
 
         specialArgs = {
           inherit self inputs;
         };
 
         modules = [
-          home-manager-unstable.darwinModules.home-manager
-          (_: {
-            nixpkgs = {
-              config.allowUnfree = true;
-              inherit overlays;
-            };
-          })
+          home-manager.darwinModules.home-manager
           ./hosts/macbook-pro
-        ];
-      };
-
-      homeConfigurations."empathy@leny" = home-manager.lib.homeManagerConfiguration {
-        pkgs = pkgsDefault;
-        extraSpecialArgs = {
-          pkgsUnstable = pkgsUnstableDefault;
-        };
-        modules = [
-          (_: {
-            nixpkgs.config.allowUnfree = true;
-          })
-          nixvim.homeModules.default
-          ./home/home.nix
-          ./modules/vscode/gui.nix
         ];
       };
 
       checks = forAllSystems (
         system:
         let
-          pkgsCheck = if lib.hasSuffix "darwin" system then mkPkgsUnstable system else mkPkgs system;
+          pkgsCheck = mkPkgs system;
 
           mkCheck =
             name: toolInputs: command:

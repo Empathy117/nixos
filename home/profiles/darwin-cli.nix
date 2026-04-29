@@ -43,8 +43,7 @@ in
 {
   home.username = "empathy";
   home.homeDirectory = "/Users/empathy";
-  home.stateVersion = "25.05";
-  home.enableNixpkgsReleaseCheck = false;
+  home.stateVersion = "25.11";
 
   targets.darwin.linkApps.enable = false;
 
@@ -59,15 +58,7 @@ in
   };
 
   imports = [
-    ../../modules/home/cli.nix
-    ../../modules/home/git.nix
-    ../../modules/home/ssh.nix
-    ../../modules/home/ssh-key.nix
-    ../../modules/home/zsh.nix
-    ../../modules/home/nodejs
-    ../../modules/home/opencode.nix
-    ../../modules/home/opencode-config.nix
+    ./shared-cli.nix
     ../../modules/vscode/gui.nix
-    ../../modules/home/nixvim.nix
   ];
 }

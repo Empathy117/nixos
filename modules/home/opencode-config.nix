@@ -1,5 +1,6 @@
 {
   pkgs,
+  lib,
   inputs ? { },
   ...
 }:
@@ -11,6 +12,24 @@ let
       inputs.opencode.packages.${pkgs.stdenv.hostPlatform.system}.default
     else
       throw "opencode package is not available in pkgs or inputs";
+  localMcp =
+    lib.optionalAttrs pkgs.stdenv.hostPlatform.isLinux {
+      playwright = {
+        type = "local";
+        enabled = true;
+        timeout = 30000;
+        command = [
+          "${pkgs.nodejs}/bin/npx"
+          "-y"
+          "@playwright/mcp@latest"
+          "--browser"
+          "chrome"
+          "--executable-path"
+          "/run/current-system/sw/bin/google-chrome"
+          "--headless"
+        ];
+      };
+    };
 in
 {
   programs.opencode = {
@@ -54,22 +73,7 @@ in
           enabled = true;
           oauth = false;
         };
-        playwright = {
-          type = "local";
-          enabled = true;
-          timeout = 30000;
-          command = [
-            "/etc/profiles/per-user/nixos/bin/npx"
-            "-y"
-            "@playwright/mcp@latest"
-            "--browser"
-            "chrome"
-            "--executable-path"
-            "/run/current-system/sw/bin/google-chrome"
-            "--headless"
-          ];
-        };
-      };
+      } // localMcp;
     };
     oh-my-opencode = {
       enable = true;

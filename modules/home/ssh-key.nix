@@ -15,7 +15,11 @@
       mkdir -p "$HOME/.ssh"
       chmod 700 "$HOME/.ssh"
 
-      host="$(cat /proc/sys/kernel/hostname 2>/dev/null || echo unknown)"
+      host="$(hostname 2>/dev/null || true)"
+      if [ -z "$host" ] && command -v scutil >/dev/null 2>&1; then
+        host="$(scutil --get LocalHostName 2>/dev/null || true)"
+      fi
+      host="''${host:-unknown}"
 
       "${pkgs.openssh}/bin/ssh-keygen" -t ed25519 -N "" \
         -C "${config.home.username}@$host-hm" -f "$key"

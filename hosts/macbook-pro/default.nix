@@ -1,6 +1,5 @@
 # hosts/macbook-pro/default.nix
 {
-  config,
   pkgs,
   lib,
   self,
@@ -15,8 +14,6 @@ let
   };
 in
 {
-  nixpkgs.config.allowUnfree = true;
-
   # CLI / Shell
   programs.fish.enable = true;
   environment.shells = [ pkgs.fish ];

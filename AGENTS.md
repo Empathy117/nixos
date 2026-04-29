@@ -5,12 +5,12 @@
 ## Layout (Where Things Live)
 - `flake.nix` — entrypoint; defines `nixosConfigurations`, `darwinConfigurations`, and shared inputs.
 - `hosts/<name>/` — host composition layer.
-  - Linux/NixOS hosts: `hosts/wsl`, `hosts/lenovo`, `hosts/devbox`.
+  - Linux/NixOS host: `hosts/wsl`.
   - macOS host: `hosts/macbook-pro` (+ `hosts/macbook-pro/apps` for GUI apps).
-- `hosts/common/*` — shared NixOS host modules (`global/` + `optional/`).
-- `home/home.nix` — Linux-ish Home Manager aggregator for `homeConfigurations` and NixOS HM.
+- `home/profiles/linux-cli.nix` — shared Home Manager profile for the WSL/Linux user environment.
+- `home/profiles/shared-cli.nix` — common CLI/Git/SSH/Neovim/user-space imports shared by Linux and macOS profiles.
 - `home/profiles/darwin-cli.nix` — macOS Home Manager profile (shell/tools/user dotfiles).
-- `modules/system/*.nix` — shared NixOS system modules.
+- `modules/system/*.nix` — reusable NixOS/WSL system modules.
 - `modules/home/*.nix` — shared Home Manager modules (mostly for Linux/NixOS targets).
 - `modules/cli/modern.nix` — cross-shell modern CLI defaults (fish/starship/fzf/etc).
 - `modules/vscode/*` — VS Code shared settings/extensions + GUI/remote split.

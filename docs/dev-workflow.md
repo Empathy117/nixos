@@ -19,10 +19,10 @@
 
 ### 1. 启用 direnv（已完成）
 
-你的系统已经配置了 direnv（在 `modules/home/direnv.nix`），重建系统后即可使用：
+你的系统已经配置了 direnv（在 `modules/cli/modern.nix`），重建系统后即可使用：
 
 ```bash
-sudo nixos-rebuild switch --flake .#lenovo
+sudo nixos-rebuild switch --flake .#wsl
 ```
 
 ### 2. 为你的项目创建开发环境
@@ -53,12 +53,12 @@ direnv allow
 { pkgs ? import <nixpkgs> {} }:
 
 pkgs.mkShell {
-  buildInputs = with pkgs; [
-    temurin-bin-8
-    nodejs_20
-    pnpm
-    maven
-  ];
+buildInputs = with pkgs; [
+  temurin-bin-8
+  nodejs_22
+  pnpm
+  maven
+];
 
   shellHook = ''
     export JAVA_HOME="${pkgs.temurin-bin-8}"
@@ -102,9 +102,9 @@ buildInputs = with pkgs; [
 
 ```nix
 buildInputs = with pkgs; [
-  nodejs_18  # Node.js 18 LTS
-  nodejs_20  # Node.js 20 LTS
-  nodejs_22  # Node.js 22
+  nodejs_20  # 例如固定到 Node.js 20
+  nodejs_22  # 或切到 Node.js 22
+  nodejs     # 或直接跟随 nixpkgs 默认版本
 ];
 ```
 
@@ -113,7 +113,7 @@ buildInputs = with pkgs; [
 ```nix
 buildInputs = with pkgs; [
   temurin-bin-8
-  nodejs_20
+  nodejs_22
   pnpm
 
   # 构建工具
@@ -139,53 +139,61 @@ buildInputs = with pkgs; [
   description = "我的全栈项目";
 
   inputs = {
-    nixpkgs.url = "github:NixOS/nixpkgs/nixos-24.11";
-    flake-utils.url = "github:numtide/flake-utils";
+    nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
   };
 
-  outputs = { self, nixpkgs, flake-utils }:
-    flake-utils.lib.eachDefaultSystem (system:
-      let
-        pkgs = import nixpkgs { inherit system; };
-      in
-      {
-        devShells.default = pkgs.mkShell {
-          buildInputs = with pkgs; [
-            # 后端
-            temurin-bin-8
-            maven
+  outputs = { nixpkgs, ... }:
+    let
+      systems = [
+        "x86_64-linux"
+        "aarch64-darwin"
+      ];
+      forAllSystems = nixpkgs.lib.genAttrs systems;
+    in
+    {
+      devShells = forAllSystems (
+        system:
+        let
+          pkgs = import nixpkgs { inherit system; };
+        in
+        {
+          default = pkgs.mkShell {
+            packages = with pkgs; [
+              # 后端
+              temurin-bin-8
+              maven
 
-            # 前端
-            nodejs_20
-            pnpm
+              # 前端
+              nodejs_22
+              pnpm
 
-            # 数据库
-            postgresql_15
+              # 数据库
+              postgresql_15
 
-            # 工具
-            git
-            docker-compose
-          ];
+              # 工具
+              git
+              docker-compose
+            ];
 
-          shellHook = ''
-            export JAVA_HOME="${pkgs.temurin-bin-8}"
-            export PGDATA="$PWD/.postgres"
+            shellHook = ''
+              export JAVA_HOME="${pkgs.temurin-bin-8}"
+              export PGDATA="$PWD/.postgres"
 
-            # 如果数据库目录不存在，初始化它
-            if [ ! -d "$PGDATA" ]; then
-              initdb -D "$PGDATA"
-            fi
+              if [ ! -d "$PGDATA" ]; then
+                initdb -D "$PGDATA"
+              fi
 
-            echo "环境已激活！"
-            echo "后端: Java $(java -version 2>&1 | head -1)"
-            echo "前端: Node $(node --version), pnpm $(pnpm --version)"
-            echo ""
-            echo "启动 PostgreSQL: pg_ctl -D .postgres -l logfile start"
-            echo "停止 PostgreSQL: pg_ctl -D .postgres stop"
-          '';
-        };
-      }
-    );
+              echo "环境已激活！"
+              echo "后端: Java $(java -version 2>&1 | head -1)"
+              echo "前端: Node $(node --version), pnpm $(pnpm --version)"
+              echo ""
+              echo "启动 PostgreSQL: pg_ctl -D .postgres -l logfile start"
+              echo "停止 PostgreSQL: pg_ctl -D .postgres stop"
+            '';
+          };
+        }
+      );
+    };
 }
 ```
 
@@ -221,14 +229,14 @@ A: 他们可以：
 
 ### Q: 我想临时测试某个工具怎么办？
 
-A: 使用 `nix-shell -p`：
+A: 使用 `nix shell`：
 
 ```bash
 # 临时使用 JDK 17
-nix-shell -p openjdk17
+nix shell nixpkgs#temurin-bin-17
 
 # 临时使用多个工具
-nix-shell -p nodejs_22 yarn python311
+nix shell nixpkgs#nodejs_22 nixpkgs#yarn nixpkgs#python311
 ```
 
 ## 进阶：多环境管理
@@ -237,30 +245,35 @@ nix-shell -p nodejs_22 yarn python311
 
 ```nix
 {
-  outputs = { self, nixpkgs, flake-utils }:
-    flake-utils.lib.eachDefaultSystem (system:
-      let
-        pkgs = import nixpkgs { inherit system; };
-      in
-      {
-        devShells = {
-          # 默认环境：JDK 8
+  outputs = { nixpkgs, ... }:
+    let
+      systems = [
+        "x86_64-linux"
+        "aarch64-darwin"
+      ];
+      forAllSystems = nixpkgs.lib.genAttrs systems;
+    in
+    {
+      devShells = forAllSystems (
+        system:
+        let
+          pkgs = import nixpkgs { inherit system; };
+        in
+        {
           default = pkgs.mkShell {
-            buildInputs = [ pkgs.temurin-bin-8 pkgs.maven ];
+            packages = [ pkgs.temurin-bin-8 pkgs.maven ];
           };
 
-          # JDK 17 环境
           jdk17 = pkgs.mkShell {
-            buildInputs = [ pkgs.temurin-bin-17 pkgs.maven ];
+            packages = [ pkgs.temurin-bin-17 pkgs.maven ];
           };
 
-          # 前端专用环境
           frontend = pkgs.mkShell {
-            buildInputs = [ pkgs.nodejs_20 pkgs.pnpm ];
+            packages = [ pkgs.nodejs_22 pkgs.pnpm ];
           };
-        };
-      }
-    );
+        }
+      );
+    };
 }
 ```
 
