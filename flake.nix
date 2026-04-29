@@ -52,6 +52,13 @@
       overlays = [
         nur.overlays.default
         (final: prev: {
+          direnv =
+            if prev.stdenv.hostPlatform.isDarwin then
+              prev.direnv.overrideAttrs (_: {
+                doCheck = false;
+              })
+            else
+              prev.direnv;
           claude-code = prev.claude-code.overrideAttrs (_old: {
             NIX_NPM_REGISTRY_OVERRIDES = builtins.toJSON {
               "https://registry.npmjs.org/" = "https://registry.npmmirror.com/";
