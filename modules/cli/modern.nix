@@ -8,6 +8,14 @@ let
       })
     else
       pkgs.nushell;
+  direnvPkg =
+    if pkgs.stdenv.hostPlatform.isDarwin then
+      # direnv 2.37.1 currently stalls in its upstream shell test suite on this macOS setup.
+      pkgs.direnv.overrideAttrs (_: {
+        doCheck = false;
+      })
+    else
+      pkgs.direnv;
 in
 {
   manual.manpages.enable = false;
@@ -319,6 +327,7 @@ in
 
   programs.direnv = {
     enable = true;
+    package = direnvPkg;
     silent = true;
     nix-direnv.enable = true;
     enableZshIntegration = true;
