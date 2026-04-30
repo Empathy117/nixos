@@ -8,6 +8,7 @@
 {
   imports = [
     inputs.nixos-wsl.nixosModules.default
+    inputs.nixos-vscode-server.nixosModules.default
     ../../modules/system/core.nix
   ];
 
