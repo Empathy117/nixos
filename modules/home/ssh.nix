@@ -2,22 +2,22 @@ _: {
   programs.ssh = {
     enable = true;
     enableDefaultConfig = false;
-    matchBlocks = {
+    settings = {
       "github.com" = {
-        hostname = "ssh.github.com";
-        port = 443;
-        user = "git";
-        identitiesOnly = true;
-        extraOptions.AddressFamily = "inet";
-        identityFile = [ "~/.ssh/id_ed25519" ];
+        HostName = "ssh.github.com";
+        Port = 443;
+        User = "git";
+        IdentitiesOnly = true;
+        AddressFamily = "inet";
+        IdentityFile = [ "~/.ssh/id_ed25519" ];
       };
       "gitee.com" = {
-        hostname = "ssh.gitee.com";
-        port = 443;
-        user = "git";
-        identitiesOnly = true;
-        extraOptions.AddressFamily = "inet";
-        identityFile = [ "~/.ssh/id_ed25519" ];
+        HostName = "ssh.gitee.com";
+        Port = 443;
+        User = "git";
+        IdentitiesOnly = true;
+        AddressFamily = "inet";
+        IdentityFile = [ "~/.ssh/id_ed25519" ];
       };
     };
   };
