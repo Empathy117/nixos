@@ -8,8 +8,6 @@ _: {
         "flakes"
       ];
 
-      auto-optimise-store = true;
-
       substituters = [
         "https://mirrors.tuna.tsinghua.edu.cn/nix-channels/store?priority=10"
         "https://mirrors.ustc.edu.cn/nix-channels/store?priority=20"
@@ -17,6 +15,7 @@ _: {
         "https://cache.nixos.org?priority=100"
       ];
     };
+    optimise.automatic = true;
   };
   # systemd.services.nix-daemon.environment = {
   #   http_proxy = "http://127.0.0.1:7890";

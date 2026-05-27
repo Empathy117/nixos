@@ -40,11 +40,7 @@ in
     };
   };
 
-  environment.systemPackages = [
-    pkgs.vim
-    pkgs.sketchybar
-  ]
-  ++ apps.all;
+  environment.systemPackages = apps.all;
 
   # Determinate Systems 已经管理 Nix 安装与 daemon；这里避免 nix-darwin 介入。
   nix.enable = false;
@@ -70,19 +66,8 @@ in
     ];
   };
 
-  services.jankyborders = {
-    enable = false;
-    active_color = "0x88b7e8ff";
-    inactive_color = "0x339dbfe6";
-    width = 3.0;
-    style = "round";
-    blur_radius = 4.0;
-    hidpi = true;
-  };
-
   system.defaults = {
     dock.autohide = true;
-    dock.mru-spaces = true;
 
     finder.AppleShowAllExtensions = true;
     finder.FXPreferredViewStyle = "clmv";

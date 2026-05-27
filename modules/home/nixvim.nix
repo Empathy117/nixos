@@ -31,34 +31,12 @@
       ignorecase = true;
       smartcase = true;
       undofile = true;
+      autoread = true;
     };
 
-    extraConfigLua = ''
-      vim.g.mapleader = " "
-      vim.o.autoread = true
-    '';
+    globals.mapleader = " ";
 
     keymaps = [
-      {
-        key = "<leader>ff";
-        action = "<cmd>Telescope find_files<CR>";
-        options.desc = "Find files";
-      }
-      {
-        key = "<leader>fg";
-        action = "<cmd>Telescope live_grep<CR>";
-        options.desc = "Live grep";
-      }
-      {
-        key = "<leader>fb";
-        action = "<cmd>Telescope buffers<CR>";
-        options.desc = "Find buffers";
-      }
-      {
-        key = "<leader>fh";
-        action = "<cmd>Telescope help_tags<CR>";
-        options.desc = "Help tags";
-      }
       {
         key = "<leader>e";
         action = "<cmd>NvimTreeToggle<CR>";

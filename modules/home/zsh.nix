@@ -11,11 +11,10 @@
 
     initContent = lib.mkBefore ''
       setopt SHARE_HISTORY HIST_IGNORE_DUPS HIST_IGNORE_SPACE EXTENDED_HISTORY
-      HISTFILESIZE=10000
 
       setproxy() {
         local host=''${1:-127.0.0.1}
-        local port=''${2:-7890}
+        local port=''${2:-7897}
         export http_proxy="http://''${host}:''${port}"
         export https_proxy="http://''${host}:''${port}"
         export all_proxy="socks5://''${host}:''${port}"

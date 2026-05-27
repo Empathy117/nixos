@@ -1,4 +1,5 @@
-_: {
+{ pkgs, ... }:
+{
   programs.ssh = {
     enable = true;
     enableDefaultConfig = false;
@@ -22,5 +23,5 @@ _: {
     };
   };
 
-  services.ssh-agent.enable = true;
+  services.ssh-agent.enable = pkgs.stdenv.hostPlatform.isLinux;
 }

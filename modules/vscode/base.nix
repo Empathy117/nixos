@@ -10,8 +10,6 @@ let
   vscodeExtensions = with pkgs.vscode-extensions; [
     jnoortheen.nix-ide
     mkhl.direnv
-    arrterian.nix-env-selector
-    bbenoist.nix
     ms-python.python
     ms-pyright.pyright
     charliermarsh.ruff

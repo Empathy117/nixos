@@ -1,5 +1,7 @@
 let
-  workspaceFolderLiteral = "$" + "{workspaceFolder}";
+  # "$" + "{workspaceFolder}" 避免 Nix 插值，生成 VS Code 可识别的 ${workspaceFolder} 变量
+  # VS Code 运行时会将其替换为实际工作区路径，macOS / WSL 通用
+  flake = "(builtins.getFlake \"$" + "{workspaceFolder}\")";
 in
 {
   "editor.formatOnSave" = false;
@@ -9,9 +11,7 @@ in
   };
   "nix.enableLanguageServer" = true;
   "nix.serverPath" = "nixd";
-  # LSP config can be passed via ``nix.serverSettings.{lsp}`` as shown below.
   "nix.serverSettings" = {
-    # check https://github.com/nix-community/nixd/blob/main/nixd/docs/configuration.md for all nixd config
     "nixd" = {
       "diagnostics" = {
         "strictEval" = false;
@@ -21,19 +21,14 @@ in
       };
       "options" = {
         "autoDiscover" = false;
-        # By default, this entry will be read from `import <nixpkgs> { }`.
-        # You can write arbitrary Nix expressions here, to produce valid "options" declaration result.
-        # Tip: for flake-based configuration, utilize `builtins.getFlake`
         "nixos" = {
-          "expr" = "(builtins.getFlake \"/absolute/path/to/flake\").nixosConfigurations.<name>.options";
+          "expr" = "${flake}.nixosConfigurations.wsl.options";
         };
         "home-manager" = {
-          "expr" = "(builtins.getFlake \"/absolute/path/to/flake\").homeConfigurations.<name>.options";
+          "expr" = "${flake}.darwinConfigurations.MacBook-Pro.options.home-manager.users.type.getSubOptions []";
         };
-        # Tip: use ${workspaceFolder} variable to define path
         "nix-darwin" = {
-          "expr" =
-            "(builtins.getFlake \"${workspaceFolderLiteral}/path/to/flake\").darwinConfigurations.<name>.options";
+          "expr" = "${flake}.darwinConfigurations.MacBook-Pro.options";
         };
       };
     };

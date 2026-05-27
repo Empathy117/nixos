@@ -33,15 +33,11 @@ in
     vim
     wget
     deadnix
-    lf
-    nixd
-    jdt-language-server
     temurin-bin-17
     claude-code
     codex
     git-filter-repo
     tmux
-    lazygit
     commitizen
     rsync
     tailscale

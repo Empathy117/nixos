@@ -63,7 +63,6 @@ let
     pkgs."ghostty-bin"
     pkgs.telegram-desktop
     pkgs.obsidian
-    pkgs.vscode
     pkgs.raycast
     pkgs.iina
   ];
