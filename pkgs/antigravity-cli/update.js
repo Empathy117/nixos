@@ -1,5 +1,5 @@
 #!/usr/bin/env nix
-/* #!nix shell --ignore-environment .#cacert .#nodejs --command node */
+/* #!nix shell --ignore-environment nixpkgs#cacert nixpkgs#nodejs --command node */
 // @ts-check
 
 import assert from "node:assert/strict";
@@ -16,7 +16,7 @@ import * as path from "node:path";
 /**
  * @typedef {object} Source
  * @property {string} url
- * @property {string} sha256
+ * @property {string} hash
  */
 
 /**
@@ -58,11 +58,11 @@ async function getLatestInformation(targetPlatform) {
 
     const buffer = Buffer.from(await response.arrayBuffer());
     const hashBuffer = await crypto.subtle.digest("SHA-256", buffer);
-    const sha256 = Buffer.from(hashBuffer).toString("hex");
+    const hash = `sha256-${Buffer.from(hashBuffer).toString("base64")}`;
 
     return {
         url: manifest.url,
-        sha256,
+        hash,
     };
 }
 

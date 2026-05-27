@@ -52,6 +52,7 @@
       overlays = [
         nur.overlays.default
         (final: prev: {
+          antigravity-cli = final.callPackage ./pkgs/antigravity-cli/package.nix { };
           direnv =
             if prev.stdenv.hostPlatform.isDarwin then
               prev.direnv.overrideAttrs (_: {

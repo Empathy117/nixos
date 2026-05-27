@@ -17,12 +17,16 @@ stdenv.mkDerivation {
   inherit (information) version;
 
   src = fetchurl {
-    inherit (source) url sha256;
+    inherit (source) url hash;
   };
+
+  sourceRoot = ".";
 
   nativeBuildInputs = lib.optionals hostPlatform.isLinux [
     autoPatchelfHook
   ];
+
+  dontStrip = true;
 
   installPhase = ''
     runHook preInstall
