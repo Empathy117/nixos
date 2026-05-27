@@ -36,6 +36,7 @@ in
     temurin-bin-17
     claude-code
     codex
+    antigravity-cli
     git-filter-repo
     tmux
     commitizen

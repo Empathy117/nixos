@@ -13,3 +13,5 @@ secrets/*.yaml
 *.vsix
 !openai-chatgpt-0.5.39.vsix
 .cache/
+
+.antigravitycli/
