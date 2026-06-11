@@ -6,7 +6,14 @@
     globalPackages = [
       # "cxresume"
     ];
-    
+
+    globalPackageBins = [
+      {
+        name = "claude";
+        package = "@anthropic-ai/claude-code";
+      }
+    ];
+
     # 真正安装（占空间，但最快）
     installedPackages = [
       # "typescript"
