@@ -38,6 +38,26 @@ in
       description = "Packages to install using npx/pnpx wrappers (on-demand)";
     };
 
+    globalPackageBins = lib.mkOption {
+      type = lib.types.listOf (
+        lib.types.submodule {
+          options = {
+            name = lib.mkOption {
+              type = lib.types.str;
+              description = "Command name to expose in PATH";
+            };
+
+            package = lib.mkOption {
+              type = lib.types.str;
+              description = "npm package to execute with the configured package manager";
+            };
+          };
+        }
+      );
+      default = [ ];
+      description = "npm packages to expose using a custom command name";
+    };
+
     installedPackages = lib.mkOption {
       type = lib.types.listOf lib.types.str;
       default = [ ];
@@ -59,6 +79,7 @@ in
         enable = lib.mkDefault true;
         packageManager = lib.mkDefault "pnpm";
         globalPackages = lib.mkDefault [ ];
+        globalPackageBins = lib.mkDefault [ ];
         installedPackages = lib.mkDefault [ ];
       };
     }
@@ -90,6 +111,12 @@ in
             exec ${packageManagerBin} ${pkg} "$@"
           ''
         ) cfg.globalPackages)
+        ++ (map (
+          pkg:
+          pkgs.writeShellScriptBin pkg.name ''
+            exec ${packageManagerBin} ${lib.escapeShellArg pkg.package} "$@"
+          ''
+        ) cfg.globalPackageBins)
         # 真正安装的包：从 nixpkgs 获取或构建
         ++ (map (
           pkg:

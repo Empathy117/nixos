@@ -52,7 +52,6 @@
       overlays = [
         nur.overlays.default
         (final: prev: {
-          antigravity-cli = final.callPackage ./pkgs/antigravity-cli/package.nix { };
           direnv =
             if prev.stdenv.hostPlatform.isDarwin then
               prev.direnv.overrideAttrs (_: {
@@ -60,11 +59,6 @@
               })
             else
               prev.direnv;
-          claude-code = prev.claude-code.overrideAttrs (_old: {
-            NIX_NPM_REGISTRY_OVERRIDES = builtins.toJSON {
-              "https://registry.npmjs.org/" = "https://registry.npmmirror.com/";
-            };
-          });
           opencode = prev.opencode.overrideAttrs (old: {
             node_modules = old.node_modules.overrideAttrs (nmOld: {
               buildPhase = ''
