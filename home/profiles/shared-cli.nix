@@ -8,6 +8,7 @@ _: {
     ../../modules/home/nodejs
     ../../modules/home/opencode.nix
     ../../modules/home/opencode-config.nix
+    ../../modules/home/agent-skills.nix
     ../../modules/home/nixvim.nix
   ];
 }

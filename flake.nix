@@ -13,6 +13,10 @@
       url = "github:anomalyco/opencode";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    obsidian-skills = {
+      url = "github:kepano/obsidian-skills";
+      flake = false;
+    };
 
     nix-darwin = {
       url = "github:nix-darwin/nix-darwin/master";
