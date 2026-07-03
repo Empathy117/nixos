@@ -32,6 +32,7 @@
 
   environment.systemPackages = [
     pkgs.google-chrome
+    pkgs.obsidian
   ];
 
   users.users.nixos.shell = pkgs.fish;
