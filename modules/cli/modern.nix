@@ -146,8 +146,9 @@ in
     enableZshIntegration = true;
 
     defaultCommand = "fd --type f --hidden --follow --exclude .git";
-    fileWidgetCommand = "fd --type f --hidden --follow --exclude .git";
-    changeDirWidgetCommand = "fd --type d --hidden --follow --exclude .git";
+    fileWidget.command = "fd --type f --hidden --follow --exclude .git";
+    changeDirWidget.command = "fd --type d --hidden --follow --exclude .git";
+    historyWidget.command = "";
 
     defaultOptions = [
       "--height 40%"
@@ -155,11 +156,11 @@ in
       "--border"
     ];
 
-    fileWidgetOptions = [
+    fileWidget.options = [
       "--preview 'bat --style=numbers --color=always --line-range :200 {}'"
     ];
 
-    changeDirWidgetOptions = [
+    changeDirWidget.options = [
       "--preview 'eza --tree --level=2 --color=always --icons {} | head -200'"
     ];
   };
