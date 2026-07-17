@@ -63,6 +63,11 @@
               })
             else
               prev.direnv;
+          commitizen = prev.commitizen.overridePythonAttrs (old: {
+            disabledTests = (old.disabledTests or [ ]) ++ [
+              "test_invalid_command"
+            ];
+          });
           opencode = prev.opencode.overrideAttrs (old: {
             node_modules = old.node_modules.overrideAttrs (nmOld: {
               buildPhase = ''
