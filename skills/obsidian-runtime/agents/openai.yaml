@@ -1,0 +1,4 @@
+interface:
+  display_name: "Obsidian Runtime"
+  short_description: "Inspect Obsidian runtime state and debug plugins"
+  default_prompt: "Use $obsidian-runtime to inspect Obsidian runtime state or debug an Obsidian plugin."
