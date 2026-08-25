@@ -68,6 +68,13 @@
               "test_invalid_command"
             ];
           });
+          pythonPackagesExtensions = prev.pythonPackagesExtensions ++ [
+            (python-final: python-prev: {
+              python-lsp-server = python-prev.python-lsp-server.overridePythonAttrs (_: {
+                doCheck = false;
+              });
+            })
+          ];
           opencode = prev.opencode.overrideAttrs (old: {
             node_modules = old.node_modules.overrideAttrs (nmOld: {
               buildPhase = ''

@@ -5,7 +5,7 @@
 {
   programs.nixvim = {
     enable = true;
-    nixpkgs.source = pkgs.path;
+    nixpkgs.useGlobalPackages = true;
 
     colorschemes.catppuccin = {
       enable = true;
