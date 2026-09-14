@@ -91,6 +91,9 @@
             };
           });
         })
+        (final: _prev: {
+          pi-coding-agent = final.callPackage ./pkgs/pi-coding-agent { };
+        })
         (final: prev: {
           yaziPlugins = prev.yaziPlugins // {
             githead = prev.yaziPlugins.mkYaziPlugin {

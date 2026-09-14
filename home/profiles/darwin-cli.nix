@@ -1,5 +1,6 @@
 {
   config,
+  pkgs,
   ...
 }:
 let
@@ -46,6 +47,10 @@ in
   home.stateVersion = "25.11";
 
   targets.darwin.linkApps.enable = false;
+
+  home.packages = [
+    pkgs.pi-coding-agent
+  ];
 
   home.sessionPath = [
     "/etc/profiles/per-user/${config.home.username}/bin"
