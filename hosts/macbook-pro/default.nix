@@ -14,6 +14,21 @@ let
   };
 in
 {
+  imports = [ ../../modules/darwin/lan-profiles.nix ];
+
+  # 有线走内网（10/8）、Wi-Fi 走公网；`lan <profile>` 在多套有线 IP 配置间切换。
+  # profile（具体 IP、网关、DNS）不进仓库，放在 ~/.config/lan/profiles.yaml，`lan edit` 可生成模板。
+  # Clash 侧对应的 Merge 配置见 Clash Verge「全局扩展配置」。
+  my.lan = {
+    enable = true;
+    # 有线网卡按优先级列出，换转接器不用改配置：`lan` 每次挑当前接上的那块
+    wiredService = [
+      "USB 10/100/1000 LAN"
+      "USB 10/100 LAN"
+      "AX88179B"
+    ];
+  };
+
   # CLI / Shell
   programs.fish.enable = true;
   environment.shells = [ pkgs.fish ];
