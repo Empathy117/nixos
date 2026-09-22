@@ -5,14 +5,6 @@
   mkDmgApp,
 }:
 let
-  keepingYouAwake = mkZipApp {
-    pname = "keepingyouawake";
-    version = "1.6.8";
-    url = "https://github.com/newmarcel/KeepingYouAwake/releases/download/1.6.8/KeepingYouAwake-1.6.8.zip";
-    hash = "sha256-gAGhSbRJDACP2sGYmLzpkC1RbEqmQSp+sPmjdEOxXGs=";
-    appName = "KeepingYouAwake.app";
-  };
-
   sublimeText = mkZipApp {
     pname = "sublime-text";
     version = "4200";
@@ -68,7 +60,6 @@ let
   ];
 
   customApps = [
-    keepingYouAwake
     sublimeText
     clashVergeRev
     baiduNetdisk

@@ -38,6 +38,8 @@ let
     macos-option-as-alt = left
 
     macos-icon = glass
+
+    keybind = global:alt+enter=new_window
   '';
 
 in
@@ -50,6 +52,9 @@ in
 
   home.packages = [
     pkgs.pi-coding-agent
+    # GNU coreutils：macOS 不自带 timeout，后台任务需要它来限时
+    # （unprefixed，会在 PATH 里优先于 /usr/bin 的 BSD 版本）
+    pkgs.coreutils
   ];
 
   home.sessionPath = [

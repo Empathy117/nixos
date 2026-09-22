@@ -15,3 +15,5 @@ secrets/*.yaml
 .cache/
 
 .antigravitycli/
+# macOS
+.DS_Store
