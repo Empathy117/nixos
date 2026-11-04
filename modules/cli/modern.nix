@@ -1,5 +1,16 @@
 { pkgs, ... }:
 let
+  atuinPkg =
+    if pkgs.stdenv.hostPlatform.system == "aarch64-darwin" && pkgs.atuin.version == "18.24.4" then
+      # These Pi session-resume tests fail in the macOS Nix build environment.
+      pkgs.atuin.overrideAttrs (old: {
+        checkFlags = (old.checkFlags or [ ]) ++ [
+          "--skip=a_diverged_copy_resumes_only_as_chosen::agent_4_Agent__Pi"
+          "--skip=a_session_gone_on_with_elsewhere_catches_up_where_it_came_from::agent_3_Agent__Pi"
+        ];
+      })
+    else
+      pkgs.atuin;
   nushellPkg =
     if pkgs.nushell.version == "0.112.1" then
       # Upstream 0.112.1 currently fails its SHLVL test in our build environment.
@@ -167,6 +178,7 @@ in
 
   programs.atuin = {
     enable = true;
+    package = atuinPkg;
     enableFishIntegration = true;
     enableZshIntegration = true;
   };
