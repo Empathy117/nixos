@@ -726,12 +726,11 @@ in
     # 网线插拔没有系统级事件钩子，这里用固定间隔对齐；
     # 状态没变化时只有两次 curl，不会重载内核。
     launchd.user.agents.lan-clash-sync = lib.mkIf cfg.clashSync {
+      # 用 command 而不是 serviceConfig.ProgramArguments：nix-darwin 只在 command 写法下
+      # 自动包一层 `wait4path /nix/store`。/nix 是单独挂载的卷，登录时 launchd 可能比它先启动，
+      # 直接 exec store 里的路径会 spawn failed（EX_CONFIG 78）并被关进惩罚队列，之后不再执行。
+      command = "${lanCli}/bin/lan clash-sync --quiet";
       serviceConfig = {
-        ProgramArguments = [
-          "${lanCli}/bin/lan"
-          "clash-sync"
-          "--quiet"
-        ];
         RunAtLoad = true;
         StartInterval = cfg.clashSyncInterval;
         StandardErrorPath = "/tmp/lan-clash-sync.err";
