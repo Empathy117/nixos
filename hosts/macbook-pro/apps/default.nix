@@ -57,6 +57,7 @@ let
     pkgs.obsidian
     pkgs.raycast
     pkgs.iina
+    pkgs.dbeaver-bin
   ];
 
   customApps = [
